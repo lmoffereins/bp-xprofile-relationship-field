@@ -1,0 +1,31 @@
+/**
+ * BP XProfile Relationship Field
+ *
+ * Admin Styles
+ */
+
+/**** BP XProfile Field Group Main Administration Screens ****/
+
+fieldset.relationship div div label,
+fieldset.relationship div label {
+	margin-right: 20px;
+}
+
+/**** BP Members Profile Administration Screens ****/
+
+.field_type_relationship > label,
+.field_type_relationship .radio > label,
+.field_type_relationship .checkbox > label {  /* these fields are usually pretty tall, so align the label for better consistency */
+	vertical-align: top;
+}
+.field_type_relationship .checkbox > label + label {  /* force checkboxes to new lines, in the right side column */
+	display: block;
+	margin-left: 200px;
+	width: auto;
+}
+.field_type_relationship .radio div:not(.field-visibility-settings) label {  /* force radio buttons to new lines */
+	display: block;
+}
+.field_type_relationship .radio div:not(.field-visibility-settings) {  /* make the radio buttons sit in the right side column */
+	display: inline-block;
+}
