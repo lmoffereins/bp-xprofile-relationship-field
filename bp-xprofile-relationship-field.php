@@ -99,10 +99,16 @@ final class BP_XProfile_Relationship_Field {
 	 * @uses add_action() To add various actions
 	 */
 	private function setup_actions() {
+
+		// Main
 		add_filter( 'bp_xprofile_get_field_types', array( $this, 'add_field_type' ) );
 
+		// Group fields
+		add_filter( 'bp_xprofile_get_groups', array( $this, 'groups_add_field_data' ), 10, 2 );
+
 		// Single field
-		add_action( 'xprofile_field_after_save', array( $this, 'save_field' ) );
+		add_action( 'xprofile_field_after_save',      array( $this, 'save_field'    )        );
+		add_filter( 'bp_get_the_profile_field_value', array( $this, 'display_field' ), 10, 3 );
 
 		// Admin
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_admin_css' ) );
@@ -147,7 +153,7 @@ final class BP_XProfile_Relationship_Field {
 		$post_type_labels = array();
 		foreach ( $post_types as $post_type ) {
 
-			// Skip attachments. They are handled separately
+			// Attachments are handled separately
 			if ( 'attachment' == $post_type->name )
 				continue;
 
@@ -216,9 +222,10 @@ final class BP_XProfile_Relationship_Field {
 		// Setup option vars
 		$options    = array();
 		$orderby    = $field->order_type;
+		$order      = $field->order_by;
 		$query_args = apply_filters( 'bp_xprofile_relationship_field_options_query_args', array(
 			'orderby' => 'default' != $orderby ? $orderby : '',
-			'order'   => 'ASC' == strtoupper( $field->order_by ) ? 'ASC' : 'DESC',
+			'order'   => empty( $order ) || 'ASC' != strtoupper( $order ) ? 'DESC' : 'ASC',
 		), $object, $field );
 
 		// Check object to get the options
@@ -264,15 +271,15 @@ final class BP_XProfile_Relationship_Field {
 
 				// Fetch global roles
 				$_roles = $wp_roles->roles;
-				$order  = 'ASC' == $query_args['order'] ? SORT_ASC : SORT_DESC;
+				$_order = 'ASC' == $query_args['order'] ? SORT_ASC : SORT_DESC;
 
 				// Order roles
 				if ( 'name' == $orderby ) {
-					array_multisort( wp_list_pluck( $wp_roles->roles, 'name' ), $order, SORT_STRING | SORT_FLAG_CASE, $_roles );
+					array_multisort( wp_list_pluck( $wp_roles->roles, 'name' ), $_order, SORT_STRING | SORT_FLAG_CASE, $_roles );
 
 				// Handle array sorting for default order
 				} else {
-					if ( SORT_DESC == $order )
+					if ( SORT_DESC == $_order )
 						$_roles = array_reverse( $_roles );
 				}
 
@@ -323,6 +330,65 @@ final class BP_XProfile_Relationship_Field {
 	}
 
 	/**
+	 * Return the single option display value
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param object $option The option to display
+	 * @param object $field Field object
+	 * @return string Option display value
+	 */
+	public function get_single_option_value( $option, $field = '' ) {
+
+		// Bail if no valid option is provided
+		if ( empty( $option ) || ! isset( $option->id ) || ! isset( $option->name ) )
+			return '';
+
+		// Use global field if not provided
+		if ( empty( $field ) ) {
+			global $field;
+		}
+
+		// Default value to option name
+		$value = $option->name;
+
+		// Check field type
+		switch ( $field->related_to ) {
+
+			// Post Type
+			case ( 'post-type-' == substr( $field->related_to, 0, 10 ) ) :
+				$value = sprintf( '<a href="%s" title="%s">%s</a>',
+					get_permalink( $option->id ),
+					sprintf( __( 'Permalink to %s', 'bp-xprofile-relationship-field' ), $option->name ),
+					$option->name
+				);
+				break;
+
+			// Taxonomy
+			case ( 'taxonomy-' == substr( $field->related_to, 0, 9 ) ) :
+				break;
+
+			// Users
+			case 'users' :
+				break;
+
+			// Roles
+			case 'roles' :
+				break;
+
+			// Comments
+			case 'comments' :
+				break;
+
+			// Attachments
+			case 'attachments' :
+				break;
+		}
+
+		return apply_filters( 'bp_xprofile_relationship_field_option_value', $value, $option, $field );
+	}
+
+	/**
 	 * Return the order types for the relationship field
 	 *
 	 * @since 1.0.0
@@ -334,6 +400,56 @@ final class BP_XProfile_Relationship_Field {
 			'name' => __( 'Name', 'bp-xprofile-relationship-field' ),
 			'date' => __( 'Date', 'bp-xprofile-relationship-field' ),
 		) );
+	}
+
+	/** Groups ****************************************************************/
+
+	/**
+	 * Manipulate fields data that were queried with profile groups
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param array $groups Groups
+	 * @param array $args Group query args
+	 * @return array Groups
+	 */
+	public function groups_add_field_data( $groups, $args ) {
+		global $wpdb, $bp;
+
+		// Bail if fields are not fetched
+		if ( ! isset( $args['fetch_fields'] ) || ! $args['fetch_fields'] )
+			return $groups;
+
+		// Setup local vars
+		$data = array();
+		$field_ids = implode( ',', wp_list_pluck( call_user_func_array( 'array_merge', wp_list_pluck( $groups, 'fields' ) ), 'id' ) );
+
+		// Walk groups
+		foreach ( $groups as $k => $group ) {
+
+			// Walk group fields
+			foreach ( $group->fields as $i => $field ) {
+
+				// Ensure order_by property presence
+				if ( ! isset( $field->order_by ) ) {
+
+					// Query field data for all fields at once
+					if ( empty( $data ) ) {
+						$data = (array) $wpdb->get_results( "SELECT id, order_by FROM {$bp->profile->table_name_fields} WHERE id IN ( {$field_ids} )" );
+					}
+
+					$field_data = wp_list_filter( $data, array( 'id' => $field->id ) );
+
+					// Set order_by value
+					$field->order_by = reset( $field_data )->order_by;
+				}
+
+				// Update group field
+				$groups[$k]->fields[$i] = $field;
+			}
+		}
+
+		return $groups;
 	}
 
 	/** Admin *****************************************************************/
@@ -418,6 +534,50 @@ final class BP_XProfile_Relationship_Field {
 			// Update
 			bp_xprofile_update_meta( $field->id, 'field', $meta, $_POST[ $meta . '_' . $this->type ] );
 		}
+	}
+
+	/**
+	 * Display field value
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param string $field_value Field value
+	 * @param string $field_type Field type
+	 * @param int $field_id Field id
+	 * @return string Field display value
+	 */
+	public function display_field( $field_value, $field_type, $field_id ) {
+		global $field;
+
+		// Bail if this is not a relationship field
+		if ( $field_type != $this->type )
+			return $field_value;
+
+		// Get possible field values
+		$options = $this->get_field_options( $field );
+
+		// Fetch original value
+		$values = explode( ',', $field->data->value );
+		$new_values = array();
+
+		// Walk all values
+		foreach ( (array) $values as $value ) {
+
+			// Sanitize
+			$value = trim( $value );
+
+			// Find option
+			$option = wp_list_filter( $options, array( 'id' => (int) $value ) );
+
+			// Use option name if item was found
+			if ( ! empty( $option ) ) {
+				$new_values[] = $this->get_single_option_value( reset( $option ) );
+			}
+		}
+
+		$values = implode( ', ', $new_values );
+
+		return apply_filters( 'bp_xprofile_relationship_field_display_value', $values, $field );
 	}
 }
 
