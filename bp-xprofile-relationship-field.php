@@ -527,6 +527,7 @@ final class BP_XProfile_Relationship_Field {
 
 		// Get possible field values
 		$options = $this->get_field_options( $field );
+		$options_id_by_name = array_combine( wp_list_pluck( $options, 'id' ), wp_list_pluck( $options, 'name' ) );
 
 		// Fetch original value
 		$values = explode( ',', $field->data->value );
@@ -544,11 +545,14 @@ final class BP_XProfile_Relationship_Field {
 				// Use option_by_value name if item was found
 				$new_values[] = $this->get_field_option_value( reset( $option_by_value ) );
 
-			// Find option by name value
-			} elseif ( $option_by_name = wp_list_filter( $options, array( 'name' => $value ) ) ) {
+			// Find option by name value. Compare sanitized titles
+			} elseif ( $id_by_name = array_search( sanitize_title( $value ), array_map( 'sanitize_title', $options_id_by_name ) ) ) {
+
+				// Get the option by value
+				$option_by_value = wp_list_filter( $options, array( 'id' => (int) $id_by_name ) );
 
 				// Use option_by_value name if item was found
-				$new_values[] = $this->get_field_option_value( reset( $option_by_name ) );
+				$new_values[] = $this->get_field_option_value( reset( $option_by_value ) );
 
 			// Option was not found, display stored value
 			} else {
@@ -728,11 +732,20 @@ function bp_xprofile_field_type_relationship() {
 
 			// Build all options
 			foreach ( array_values( $options ) as $k => $option ) {
-				$selected    = '';
+				$selected    = false;
 				$option_html = '';
 
 				// Run the allowed option name through the before_save filter, so we'll be sure to get a match
 				$allowed_option = xprofile_sanitize_data_value_before_save( $option->id, false, false );
+
+				// First, check to see whether the user's saved values match the option
+				if ( in_array( $allowed_option, $option_values ) ) {
+					$selected = true;
+
+				// Check if the option name matches the current value. Compare sanitized titles
+				} elseif ( in_array( sanitize_title( $option->name ), array_map( 'sanitize_title', $option_values ) ) ) {
+					$selected = true;
+				}
 
 				// Build single option html
 				switch ( $method ) {
@@ -740,10 +753,8 @@ function bp_xprofile_field_type_relationship() {
 					case 'radio' :
 					case 'checkbox' :
 
-						// First, check to see whether the user's saved values match the option
-						if ( in_array( $allowed_option, $option_values ) ) {
+						if ( $selected )
 							$selected = ' checked="checked"';
-						}
 
 						// Relationships do not support defaults (yet).
 
@@ -759,10 +770,8 @@ function bp_xprofile_field_type_relationship() {
 
 					case 'multiselectbox' :
 
-						// First, check to see whether the user-entered value matches
-						if ( in_array( $allowed_option, $option_values ) ) {
+						if ( $selected )
 							$selected = ' selected="selected"';
-						}
 
 						// Relationships do not support defaults (yet).
 
