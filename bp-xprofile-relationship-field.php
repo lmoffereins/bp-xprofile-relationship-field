@@ -3,8 +3,6 @@
 /**
  * The BuddyPress XProfile Relationship Field Plugin
  *
- * Inspired by Pods' relationship connector.
- *
  * @package BP XProfile Relationship Field
  * @subpackage Main
  */
@@ -53,6 +51,7 @@ final class BP_XProfile_Relationship_Field {
 			$instance->setup_globals();
 			$instance->setup_actions();
 		}
+
 		return $instance;
 	}
 
@@ -212,8 +211,8 @@ final class BP_XProfile_Relationship_Field {
 		$relationships = array_keys( call_user_func_array( 'array_merge', wp_list_pluck( $this->get_relationships(), 'options' ) ) );
 
 		// Setup and fetch field meta
-		$field   = $this->populate_field( $field );
-		$object  = $field->related_to;
+		$field  = $this->populate_field( $field );
+		$object = $field->related_to;
 
 		// Bail if object does not exist
 		if ( empty( $object ) || ! in_array( $object, $relationships ) )
@@ -330,7 +329,7 @@ final class BP_XProfile_Relationship_Field {
 	}
 
 	/**
-	 * Return the single option display value
+	 * Return the single field option display value
 	 *
 	 * @since 1.0.0
 	 *
@@ -338,7 +337,7 @@ final class BP_XProfile_Relationship_Field {
 	 * @param object $field Field object
 	 * @return string Option display value
 	 */
-	public function get_single_option_value( $option, $field = '' ) {
+	public function get_field_option_value( $option, $field = '' ) {
 
 		// Bail if no valid option is provided
 		if ( empty( $option ) || ! isset( $option->id ) || ! isset( $option->name ) )
@@ -357,6 +356,8 @@ final class BP_XProfile_Relationship_Field {
 
 			// Post Type
 			case ( 'post-type-' == substr( $field->related_to, 0, 10 ) ) :
+
+				// Link posts to their respective pages
 				$value = sprintf( '<a href="%s" title="%s">%s</a>',
 					get_permalink( $option->id ),
 					sprintf( __( 'Permalink to %s', 'bp-xprofile-relationship-field' ), $option->name ),
@@ -397,8 +398,8 @@ final class BP_XProfile_Relationship_Field {
 	 */
 	public function get_order_types() {
 		return apply_filters( 'bp_xprofile_relationship_field_order_types', array(
-			'name' => __( 'Name', 'bp-xprofile-relationship-field' ),
-			'date' => __( 'Date', 'bp-xprofile-relationship-field' ),
+			'name' => _x( 'Name', 'Object order type', 'bp-xprofile-relationship-field' ),
+			'date' => _x( 'Date', 'Object order type', 'bp-xprofile-relationship-field' ),
 		) );
 	}
 
@@ -420,9 +421,11 @@ final class BP_XProfile_Relationship_Field {
 		if ( ! isset( $args['fetch_fields'] ) || ! $args['fetch_fields'] )
 			return $groups;
 
-		// Setup local vars
-		$data = array();
+		// Fetch all field ids to query for their data
 		$field_ids = implode( ',', wp_list_pluck( call_user_func_array( 'array_merge', wp_list_pluck( $groups, 'fields' ) ), 'id' ) );
+
+		// Query field data for all fields at once
+		$data = (array) $wpdb->get_results( "SELECT id, order_by FROM {$bp->profile->table_name_fields} WHERE id IN ( $field_ids )" );
 
 		// Walk groups
 		foreach ( $groups as $k => $group ) {
@@ -430,18 +433,19 @@ final class BP_XProfile_Relationship_Field {
 			// Walk group fields
 			foreach ( $group->fields as $i => $field ) {
 
+				// Get data of particular field
+				$field_data = wp_list_filter( $data, array( 'id' => $field->id ) );
+				if ( ! empty( $field_data ) ) {
+					$field_data = reset( $field_data );
+
+				// Field data not found
+				} else {
+					continue;
+				}
+
 				// Ensure order_by property presence
 				if ( ! isset( $field->order_by ) ) {
-
-					// Query field data for all fields at once
-					if ( empty( $data ) ) {
-						$data = (array) $wpdb->get_results( "SELECT id, order_by FROM {$bp->profile->table_name_fields} WHERE id IN ( {$field_ids} )" );
-					}
-
-					$field_data = wp_list_filter( $data, array( 'id' => $field->id ) );
-
-					// Set order_by value
-					$field->order_by = reset( $field_data )->order_by;
+					$field->order_by = $field_data->order_by;
 				}
 
 				// Update group field
@@ -505,38 +509,6 @@ final class BP_XProfile_Relationship_Field {
 	}
 
 	/**
-	 * Delete field data object with meta
-	 *
-	 * @since 1.0.0
-	 *
-	 * @param BP_XProfile_Field $field Field object
-	 */
-	public function delete_field( $field ) {
-
-		// Delete field meta
-		foreach ( $this->get_meta_keys() as $meta ) {
-			bp_xprofile_delete_meta( $field->id, 'field', $meta );
-		}
-	}
-
-	/**
-	 * Save field object
-	 *
-	 * @since 1.0.0
-	 */
-	public function save_field( $field ) {
-
-		// Save field meta
-		foreach ( $this->get_meta_keys() as $meta ) {
-			if ( ! isset( $_POST[ $meta . '_' . $this->type ] ) )
-				continue;
-
-			// Update
-			bp_xprofile_update_meta( $field->id, 'field', $meta, $_POST[ $meta . '_' . $this->type ] );
-		}
-	}
-
-	/**
 	 * Display field value
 	 *
 	 * @since 1.0.0
@@ -566,18 +538,59 @@ final class BP_XProfile_Relationship_Field {
 			// Sanitize
 			$value = trim( $value );
 
-			// Find option
-			$option = wp_list_filter( $options, array( 'id' => (int) $value ) );
+			// Find option by id value
+			if ( $option_by_value = wp_list_filter( $options, array( 'id' => (int) $value ) ) ) {
 
-			// Use option name if item was found
-			if ( ! empty( $option ) ) {
-				$new_values[] = $this->get_single_option_value( reset( $option ) );
+				// Use option_by_value name if item was found
+				$new_values[] = $this->get_field_option_value( reset( $option_by_value ) );
+
+			// Find option by name value
+			} elseif ( $option_by_name = wp_list_filter( $options, array( 'name' => $value ) ) ) {
+
+				// Use option_by_value name if item was found
+				$new_values[] = $this->get_field_option_value( reset( $option_by_name ) );
+
+			// Option was not found, display stored value
+			} else {
+				$new_values[] = $value;
 			}
 		}
 
 		$values = implode( ', ', $new_values );
 
 		return apply_filters( 'bp_xprofile_relationship_field_display_value', $values, $field );
+	}
+
+	/**
+	 * Save field object
+	 *
+	 * @since 1.0.0
+	 */
+	public function save_field( $field ) {
+
+		// Save field meta
+		foreach ( $this->get_meta_keys() as $meta ) {
+			if ( ! isset( $_POST[ $meta . '_' . $this->type ] ) )
+				continue;
+
+			// Update
+			bp_xprofile_update_meta( $field->id, 'field', $meta, $_POST[ $meta . '_' . $this->type ] );
+		}
+	}
+
+	/**
+	 * Delete field data object with meta
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param BP_XProfile_Field $field Field object
+	 */
+	public function delete_field( $field ) {
+
+		// Delete field meta
+		foreach ( $this->get_meta_keys() as $meta ) {
+			bp_xprofile_delete_meta( $field->id, 'field', $meta );
+		}
 	}
 }
 
