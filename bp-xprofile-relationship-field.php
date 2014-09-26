@@ -110,7 +110,7 @@ final class BP_XProfile_Relationship_Field {
 		add_filter( 'bp_get_the_profile_field_value', array( $this, 'display_field' ), 10, 3 );
 
 		// Admin
-		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_admin_css' ) );
+		add_action( 'admin_enqueue_scripts', array( $this, 'admin_enqueue_scripts' ) );
 	}
 
 	/** Public Methods ********************************************************/
@@ -459,19 +459,19 @@ final class BP_XProfile_Relationship_Field {
 	/** Admin *****************************************************************/
 
 	/**
-	 * Enqueue styles for the admin pages
+	 * Enqueue styles and scripts for the admin pages
 	 *
 	 * @since 1.0.0
 	 *
 	 * @uses wp_enqueue_style()
 	 */
-	public function enqueue_admin_css() {
+	public function admin_enqueue_scripts() {
 
-		// Bail if not on profile page
+		// Bail if not on profile fields or edit page
 		if ( empty( $_GET['page'] ) || ! in_array( $_GET['page'], array( 'bp-profile-setup', 'bp-profile-edit' ) ) )
 			return;
 
-		wp_enqueue_style( 'bp-xprofile-relationship-field-admin', $this->includes_url . 'assets/admin.css', array(), $this->version );
+		wp_enqueue_style( 'bp-xprofile-relationship-field', $this->includes_url . 'assets/admin.css', array(), $this->version );
 	}
 
 	/** BP_XProfile_Field *****************************************************/
@@ -628,7 +628,7 @@ function bp_xprofile_field_type_relationship() {
 			$this->name     = _x( 'Relationship', 'xprofile field type', 'bp-xprofile-relationship-field' );
 
 			$this->accepts_null_value = true;
-			// $this->supports_options = true; // Has only meaning for multiselect options that are saved in DB
+			$this->supports_options = false; // Has effect for select options that are saved in DB
 
 			$this->set_format( '/^.+$/', 'replace' );
 			do_action( 'bp_xprofile_field_type_relationship', $this );
@@ -864,8 +864,10 @@ function bp_xprofile_field_type_relationship() {
 			$current_field = bp_xprofile_relationship_field()->populate_field( $current_field );
 			$class = $current_field->type != $type ? 'display: none;' : ''; ?>
 
+			<script types="text/javascript">XProfileAdmin.supports_options_field_types.push( '<?php echo $type; ?>' );</script>
+
 			<div id="<?php echo esc_attr( $type ); ?>" class="postbox bp-options-box" style="<?php echo esc_attr( $class ); ?> margin-top: 15px;">
-				<h3><?php esc_html_e( 'Please enter options for this Field:', 'buddypress' ); ?></h3>
+				<h3><?php esc_html_e( 'Settings for this Field:', 'bp-xprofile-relationship-field' ); ?></h3>
 				<div class="inside">
 					<p>
 						<label for="related_to_<?php echo esc_attr( $type ); ?>"><?php esc_html_e( 'Related To:', 'bp-xprofile-relationship-field' ); ?></label><br/>
