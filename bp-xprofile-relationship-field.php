@@ -88,6 +88,10 @@ final class BP_XProfile_Relationship_Field {
 
 		// Languages
 		$this->lang_dir     = trailingslashit( $this->plugin_dir . 'languages' );
+
+		/** Plugin ***************************************************/
+
+		$this->domain = 'bp-xprofile-relationship-field';
 	}
 
 	/**
@@ -103,6 +107,9 @@ final class BP_XProfile_Relationship_Field {
 		if ( ! bp_is_active( 'xprofile' ) )
 			return false;
 
+		// Plugin
+		add_action( 'init', array( $this, 'load_textdomain' ) );
+
 		// Main
 		add_filter( 'bp_xprofile_get_field_types', array( $this, 'add_field_type' ) );
 
@@ -115,6 +122,38 @@ final class BP_XProfile_Relationship_Field {
 
 		// Admin
 		add_action( 'admin_enqueue_scripts', array( $this, 'admin_enqueue_scripts' ) );
+	}
+
+	/** Plugin ****************************************************************/
+
+	/**
+	 * Load the translation file for current language
+	 *
+	 * Note that custom translation files inside the Plugin folder will
+	 * be removed on Plugin updates. If you're creating custom translation
+	 * files, please use the global language folder.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @uses apply_filters() Calls 'plugin_locale' with {@link get_locale()} value
+	 * @uses load_textdomain() To load the textdomain
+	 * @uses load_plugin_textdomain() To load the plugin textdomain
+	 */
+	public function load_textdomain() {
+
+		// Traditional WordPress plugin locale filter
+		$locale        = apply_filters( 'plugin_locale', get_locale(), $this->domain );
+		$mofile        = sprintf( '%1$s-%2$s.mo', $this->domain, $locale );
+
+		// Setup paths to current locale file
+		$mofile_local  = $this->lang_dir . $mofile;
+		$mofile_global = WP_LANG_DIR . '/bp-xprofile-relationship-field/' . $mofile;
+
+		// Look in global /wp-content/languages/bp-xprofile-relationship-field folder first
+		load_textdomain( $this->domain, $mofile_global );
+
+		// Look in global /wp-content/languages/plugins/ and local plugin languages folder
+		load_plugin_textdomain( $this->domain, false, 'bp-xprofile-relationship-field/languages' );
 	}
 
 	/** Public Methods ********************************************************/
