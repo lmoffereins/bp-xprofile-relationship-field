@@ -95,9 +95,13 @@ final class BP_XProfile_Relationship_Field {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @uses add_action() To add various actions
+	 * @uses bp_is_active() To check if xprofile component is active
 	 */
 	private function setup_actions() {
+
+		// Bail if profile fields are not active
+		if ( ! bp_is_active( 'xprofile' ) )
+			return false;
 
 		// Main
 		add_filter( 'bp_xprofile_get_field_types', array( $this, 'add_field_type' ) );
@@ -941,11 +945,6 @@ function bp_xprofile_field_type_relationship() {
  * @uses BP_XProfile_Relationship_Field
  */
 function bp_xprofile_relationship_field() {
-
-	// Bail if profile fields are not active
-	if ( ! bp_is_active( 'xprofile' ) )
-		return false;
-
 	return BP_XProfile_Relationship_Field::instance();
 }
 
