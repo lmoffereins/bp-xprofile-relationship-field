@@ -20,7 +20,7 @@
  */
 
 // Exit if accessed directly
-if ( ! defined( 'ABSPATH' ) ) exit;
+defined( 'ABSPATH' ) || exit;
 
 if ( ! class_exists( 'BP_XProfile_Relationship_Field' ) ) :
 /**
