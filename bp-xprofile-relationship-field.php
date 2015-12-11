@@ -9,7 +9,7 @@
 
 /**
  * Plugin Name:       BP XProfile Relationship Field
- * Description:       Adds a 'relationship' profile field type to connect users to other objects
+ * Description:       Adds a 'relationship' profile field type to BuddyPress to connect users with other objects
  * Plugin URI:        https://github.com/lmoffereins/bp-xprofile-relationship-field
  * Version:           1.0.0
  * Author:            Laurens Offereins
