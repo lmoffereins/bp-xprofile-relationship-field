@@ -103,9 +103,9 @@ final class BP_XProfile_Relationship_Field {
 	 */
 	private function setup_actions() {
 
-		// Bail if profile fields are not active
+		// Bail when XProfile component is not active
 		if ( ! bp_is_active( 'xprofile' ) )
-			return false;
+			return;
 
 		// Plugin
 		add_action( 'init', array( $this, 'load_textdomain' ) );
@@ -257,7 +257,7 @@ final class BP_XProfile_Relationship_Field {
 		$field  = $this->populate_field( $field );
 		$object = $field->related_to;
 
-		// Bail if object does not exist
+		// Bail when object does not exist
 		if ( empty( $object ) || ! in_array( $object, $relationships ) )
 			return array();
 
@@ -382,7 +382,7 @@ final class BP_XProfile_Relationship_Field {
 	 */
 	public function get_field_option_value( $option, $field = '' ) {
 
-		// Bail if no valid option is provided
+		// Bail when no valid option is provided
 		if ( empty( $option ) || ! isset( $option->id ) || ! isset( $option->name ) )
 			return '';
 
@@ -460,7 +460,7 @@ final class BP_XProfile_Relationship_Field {
 	public function groups_add_field_data( $groups, $args ) {
 		global $wpdb, $bp;
 
-		// Bail if fields are not fetched
+		// Bail when fields are not fetched
 		if ( ! isset( $args['fetch_fields'] ) || ! $args['fetch_fields'] )
 			return $groups;
 
@@ -510,7 +510,7 @@ final class BP_XProfile_Relationship_Field {
 	 */
 	public function admin_enqueue_scripts() {
 
-		// Bail if not on profile fields or edit page
+		// Bail when not on profile fields or edit page
 		if ( empty( $_GET['page'] ) || ! in_array( $_GET['page'], array( 'bp-profile-setup', 'bp-profile-edit' ) ) )
 			return;
 
@@ -564,7 +564,7 @@ final class BP_XProfile_Relationship_Field {
 	public function display_field( $field_value, $field_type, $field_id ) {
 		global $field;
 
-		// Bail if this is not a relationship field
+		// Bail when this is not a relationship field
 		if ( $field_type != $this->type )
 			return $field_value;
 
@@ -987,7 +987,7 @@ function bp_xprofile_relationship_field() {
 	return BP_XProfile_Relationship_Field::instance();
 }
 
-// Fire it up!
+// Initiate when BP has loaded
 add_action( 'bp_loaded', 'bp_xprofile_relationship_field' );
 
 endif; // class_exists
