@@ -464,14 +464,26 @@ final class BP_XProfile_Relationship_Field {
 		if ( ! isset( $args['fetch_fields'] ) || ! $args['fetch_fields'] )
 			return $groups;
 
+		// Collect groups with fields. Groups might by empty.
+		$groups_with_fields = array();
+		foreach ( $groups as $group ) {
+			if ( isset( $group->fields ) ) {
+				$groups_with_fields[] = $group;
+			}
+		}
+
 		// Fetch all field ids to query for their data
-		$field_ids = implode( ',', wp_list_pluck( call_user_func_array( 'array_merge', wp_list_pluck( $groups, 'fields' ) ), 'id' ) );
+		$field_ids = implode( ',', wp_list_pluck( call_user_func_array( 'array_merge', wp_list_pluck( $groups_with_fields, 'fields' ) ), 'id' ) );
 
 		// Query field data for all fields at once
 		$data = (array) $wpdb->get_results( "SELECT id, order_by FROM {$bp->profile->table_name_fields} WHERE id IN ( $field_ids )" );
 
 		// Walk groups
 		foreach ( $groups as $k => $group ) {
+
+			// Skip groups without fields
+			if ( ! isset( $group->fields ) )
+				continue;
 
 			// Walk group fields
 			foreach ( $group->fields as $i => $field ) {
@@ -492,7 +504,7 @@ final class BP_XProfile_Relationship_Field {
 				}
 
 				// Update group field
-				$groups[$k]->fields[$i] = $field;
+				$groups[ $k ]->fields[ $i ] = $field;
 			}
 		}
 
