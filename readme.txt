@@ -2,7 +2,7 @@
 Contributors: Offereins
 Tags: buddypress, xprofile, profile, field, type, relationship, relation, objects
 Requires at least: 3.8, BP 2.1
-Tested up to: 4.0, BP 2.1
+Tested up to: 4.5, BP 2.6
 Stable tag: 1.0.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -34,7 +34,8 @@ This plugin requires BP 2.1 to be functional!
 == Changelog ==
 
 = 1.0.1 =
-* Fix show/hide admin field type options
+* Compatibility with BP 2.6
+* Fixed show/hide admin field type options
 
 = 1.0.0 =
 * Initial release
