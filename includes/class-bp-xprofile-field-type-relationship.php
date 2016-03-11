@@ -1,7 +1,7 @@
 <?php
 
 /**
- * The XProfile Field Type Relationship Class
+ * The BP XProfile Field Type Relationship Class
  * 
  * @package BP XProfile Relationship Field
  * @subpackage Main
@@ -10,13 +10,13 @@
 // Exit if accessed directly
 defined( 'ABSPATH' ) || exit;
 
-if ( ! class_exists( 'XProfile_Field_Type_Relationship' ) ) :
+if ( ! class_exists( 'BP_XProfile_Field_Type_Relationship' ) ) :
 /**
  * Relationship xprofile field type
  *
  * @since 1.0.0
  */
-class XProfile_Field_Type_Relationship extends BP_XProfile_Field_Type {
+class BP_XProfile_Field_Type_Relationship extends BP_XProfile_Field_Type {
 
 	/**
 	 * Constructor for the single relationship field type

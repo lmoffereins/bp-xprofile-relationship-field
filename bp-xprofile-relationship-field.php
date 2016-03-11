@@ -169,10 +169,10 @@ final class BP_XProfile_Relationship_Field {
 	public function add_field_type( $fields ) {
 
 		// Declare field type
-		require_once( $this->includes_dir . 'class-xprofile-field-type-relationship.php' );
+		require_once( $this->includes_dir . 'class-bp-xprofile-field-type-relationship.php' );
 
 		// Add field type
-		$fields[ $this->type ] = 'XProfile_Field_Type_Relationship';
+		$fields[ $this->type ] = 'BP_XProfile_Field_Type_Relationship';
 
 		return $fields;
 	}
