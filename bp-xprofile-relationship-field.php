@@ -119,6 +119,8 @@ final class BP_XProfile_Relationship_Field {
 		// Single field
 		add_action( 'xprofile_field_after_save',      array( $this, 'save_field'    )        );
 		add_filter( 'bp_get_the_profile_field_value', array( $this, 'display_field' ), 10, 3 );
+		add_filter( 'bp_get_member_field_data',       array( $this, 'display_data'  ), 10, 2 );
+		add_filter( 'bp_get_profile_field_data',      array( $this, 'display_data'  ), 10, 2 );
 
 		// Admin
 		add_action( 'admin_enqueue_scripts', array( $this, 'admin_enqueue_scripts' ) );
@@ -618,6 +620,47 @@ final class BP_XProfile_Relationship_Field {
 		$values = implode( ', ', $new_values );
 
 		return apply_filters( 'bp_xprofile_relationship_field_display_value', $values, $field );
+	}
+
+	/**
+	 * Display field data
+	 *
+	 * Filters {@link bp_get_member_field_data()} and {@link bp_get_profile_field_data()}.
+	 *
+	 * @since 1.0.3
+	 *
+	 * @param mixed $data Field data
+	 * @param array $args Field data arguments
+	 * @return mixed Field data
+	 */
+	public function display_data( $data, $args = array() ) {
+
+		// Valid field was queried, so get the field
+		if ( $args['field'] && $args['user_id']
+			&& $field = xprofile_get_field( is_numeric( $args['field'] ) ? $args['field'] : xprofile_get_field_id_from_name( $args['field'] ) )
+		) {
+
+			// Populate field data
+			$field->data = $field->get_field_data( $args['user_id'] );
+
+			// Temporary overwrite of the `$field` global
+			if ( $global = isset( $GLOBALS['field'] ) ) {
+				$_field = $GLOBALS['field'];
+			}
+			$GLOBALS['field'] = $field;
+
+			// Define value to display
+			$data = $this->display_field( $data, $field->type, $field->id );
+
+			// Reset global
+			if ( $global ) {
+				$GLOBALS['field'] = $_field;
+			} else {
+				unset( $GLOBALS['field'] );
+			}
+		}
+
+		return $data;
 	}
 
 	/**
