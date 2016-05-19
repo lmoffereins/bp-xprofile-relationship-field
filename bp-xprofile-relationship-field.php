@@ -632,7 +632,7 @@ final class BP_XProfile_Relationship_Field {
 	/**
 	 * Display field data
 	 *
-	 * Filters {@link bp_get_member_field_data()} and {@link bp_get_profile_field_data()}.
+	 * Filters {@link bp_get_member_field_data()} and {@link bp_get_profile_field_data()} as per BP 2.6.
 	 *
 	 * @since 1.0.3
 	 *
@@ -650,7 +650,7 @@ final class BP_XProfile_Relationship_Field {
 	public function display_data( $data, $args = array() ) {
 
 		// Valid field was queried, so get the field
-		if ( $args['field'] && $args['user_id']
+		if ( ! empty( $args['field'] ) && ! empty( $args['user_id'] )
 			&& $field = xprofile_get_field( is_numeric( $args['field'] ) ? $args['field'] : xprofile_get_field_id_from_name( $args['field'] ) )
 		) {
 
