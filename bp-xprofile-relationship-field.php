@@ -538,6 +538,7 @@ final class BP_XProfile_Relationship_Field {
 	 *
 	 * @since 1.0.0
 	 *
+	 * @uses apply_filters() Calls 'bp_xprofile_relationship_field_meta_keys'
 	 * @return array Meta keys
 	 */
 	public function get_meta_keys() {
@@ -553,6 +554,8 @@ final class BP_XProfile_Relationship_Field {
 	 *
 	 * @since 1.0.0
 	 *
+	 * @uses BP_XProfile_Relationship_Field::get_meta_keys()
+	 * @uses bp_xprofile_get_meta()
 	 * @param BP_XProfile_Field $field Field object
 	 */
 	public function populate_field( $field ) {
@@ -569,6 +572,10 @@ final class BP_XProfile_Relationship_Field {
 	 * Display field value
 	 *
 	 * @since 1.0.0
+	 *
+	 * @uses BP_XProfile_Relationship_Field::get_field_options()
+	 * @uses BP_XProfile_Relationship_Field::get_field_option_value()
+	 * @uses apply_filters() Calls 'bp_xprofile_relationship_field_display_value'
 	 *
 	 * @param string $field_value Field value
 	 * @param string $field_type Field type
@@ -629,6 +636,13 @@ final class BP_XProfile_Relationship_Field {
 	 *
 	 * @since 1.0.3
 	 *
+	 * @global BP_XProfile_Field $field
+	 *
+	 * @uses xprofile_get_field()
+	 * @uses xprofile_get_field_id_from_name()
+	 * @uses BP_XProfile_Field::get_field_data()
+	 * @uses BP_XProfile_Relationship_Field::display_field()
+	 *
 	 * @param mixed $data Field data
 	 * @param array $args Field data arguments
 	 * @return mixed Field data
@@ -667,6 +681,10 @@ final class BP_XProfile_Relationship_Field {
 	 * Save field object
 	 *
 	 * @since 1.0.0
+	 *
+	 * @uses BP_XProfile_Relationship_Field::get_meta_keys()
+	 * @uses bp_xprofile_update_meta()
+	 * @param BP_XProfile_Field $field Field object
 	 */
 	public function save_field( $field ) {
 
@@ -685,6 +703,8 @@ final class BP_XProfile_Relationship_Field {
 	 *
 	 * @since 1.0.0
 	 *
+	 * @uses BP_XProfile_Relationship_Field::get_meta_keys()
+	 * @uses bp_xprofile_delete_meta()
 	 * @param BP_XProfile_Field $field Field object
 	 */
 	public function delete_field( $field ) {
