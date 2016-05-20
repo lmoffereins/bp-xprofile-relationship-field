@@ -43,9 +43,13 @@ class BP_XProfile_Field_Type_Relationship extends BP_XProfile_Field_Type {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param array $raw_properties Optional key/value array of {@link http://dev.w3.org/html5/markup/input.checkbox.html permitted attributes} that you want to add.
+	 * @param array $raw_properties Optional key/value array of
+	 *                              {@see http://dev.w3.org/html5/markup/input.checkbox.html permitted attributes}
+	 *                              that you want to add.
 	 */
 	public function edit_field_html( array $raw_properties = array() ) {
+
+		// Define local variables
 		$user_id = bp_displayed_user_id();
 		$method  = bp_xprofile_get_meta( bp_get_the_profile_field_id(), 'field', 'selection_method' );
 		$args    = array();
@@ -59,39 +63,72 @@ class BP_XProfile_Field_Type_Relationship extends BP_XProfile_Field_Type {
 		// Setup selection method
 		switch ( $method ) {
 
+			// Multiselect
 			case 'multiselectbox' :
 				$args['multiple'] = 'multiple';
+
+			// Select
 			case 'selectbox' :
-				$multi = isset( $args['multiple'] ) ? '[]' : '';
+				$multi        = isset( $args['multiple'] ) ? '[]' : '';
 				$args['name'] = bp_get_the_profile_field_input_name() . $multi;
 				$args['id']   = bp_get_the_profile_field_input_name() . $multi;
 
 				$html = $this->get_edit_field_html_elements( array_merge( $args, $raw_properties ) ); ?>
 
-			<label for="<?php echo $args['name']; ?>"><?php bp_the_profile_field_name(); ?> <?php if ( bp_get_the_profile_field_is_required() ) : ?><?php esc_html_e( '(required)', 'buddypress' ); ?><?php endif; ?></label>
-			<?php do_action( bp_get_the_profile_field_errors_action() ); ?>
+			<label for="<?php echo $args['name']; ?>">
+				<?php bp_the_profile_field_name(); ?>
+				<?php bp_the_profile_field_required_label(); ?>
+			</label>
+
+			<?php
+
+			/** This action is documented in bp-xprofile/bp-xprofile-classes */
+			do_action( bp_get_the_profile_field_errors_action() ); ?>
+
 			<select <?php echo $html; ?>>
-				<?php bp_the_profile_field_options( "user_id={$user_id}" ); ?>
+				<?php bp_the_profile_field_options( array(
+					'user_id' => $user_id
+				) ); ?>
 			</select>
 
 			<?php if ( isset( $args['multiple'] ) && ! bp_get_the_profile_field_is_required() ) : ?>
-				<a class="clear-value" href="javascript:clear( '<?php echo esc_js( bp_get_the_profile_field_input_name() ); ?>[]' );"><?php esc_html_e( 'Clear', 'buddypress' ); ?></a>
+
+				<a class="clear-value" href="javascript:clear( '<?php echo esc_js( bp_get_the_profile_field_input_name() ); ?>[]' );">
+					<?php esc_html_e( 'Clear', 'buddypress' ); ?>
+				</a>
+
 			<?php endif; ?>
 
 				<?php
 				break;
 
-			case 'radio' :
-			case 'checkbox' : ?>
+			// Radio
+			case 'checkbox' :
+			// Checkbox
+			case 'radio' : ?>
 
 			<div class="<?php echo $method; ?>">
 
-				<label for="<?php bp_the_profile_field_input_name(); ?>"><?php bp_the_profile_field_name(); ?> <?php if ( bp_get_the_profile_field_is_required() ) : ?><?php esc_html_e( '(required)', 'buddypress' ); ?><?php endif; ?></label>
-				<?php do_action( bp_get_the_profile_field_errors_action() ); ?>
-				<?php bp_the_profile_field_options( "user_id={$user_id}" ); ?>
+				<label for="<?php bp_the_profile_field_input_name(); ?>">
+					<?php bp_the_profile_field_name(); ?>
+					<?php bp_the_profile_field_required_label(); ?>
+				</label>
+
+				<?php
+
+				/** This action is documented in bp-xprofile/bp-xprofile-classes */
+				do_action( bp_get_the_profile_field_errors_action() ); ?>
+
+				<?php bp_the_profile_field_options( array(
+					'user_id' => $user_id
+				) ); ?>
 
 				<?php if ( 'radio' == $method && ! bp_get_the_profile_field_is_required() ) : ?>
-					<a class="clear-value" href="javascript:clear( '<?php echo esc_js( bp_get_the_profile_field_input_name() ); ?>' );"><?php esc_html_e( 'Clear', 'buddypress' ); ?></a>
+
+					<a class="clear-value" href="javascript:clear( '<?php echo esc_js( bp_get_the_profile_field_input_name() ); ?>' );">
+						<?php esc_html_e( 'Clear', 'buddypress' ); ?>
+					</a>
+
 				<?php endif; ?>
 
 			</div>
