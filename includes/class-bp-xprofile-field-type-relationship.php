@@ -107,12 +107,12 @@ class BP_XProfile_Field_Type_Relationship extends BP_XProfile_Field_Type {
 			// Checkbox
 			case 'radio' : ?>
 
-			<div class="<?php echo $method; ?>">
+			<fieldset class="<?php echo $method; ?>">
 
-				<label for="<?php bp_the_profile_field_input_name(); ?>">
+				<legend>
 					<?php bp_the_profile_field_name(); ?>
 					<?php bp_the_profile_field_required_label(); ?>
-				</label>
+				</legend>
 
 				<?php
 
@@ -131,7 +131,7 @@ class BP_XProfile_Field_Type_Relationship extends BP_XProfile_Field_Type {
 
 				<?php endif; ?>
 
-			</div>
+			</fieldset>
 
 				<?php
 				break;
@@ -197,7 +197,7 @@ class BP_XProfile_Field_Type_Relationship extends BP_XProfile_Field_Type {
 
 					// Relationships do not support defaults (yet).
 
-					$option_html = '<label><input %1$s type="' . $method . '" name="%2$s" id="%3$s" value="%4$s">%5$s</label>';
+					$option_html = '<label for="%3$s" class="option-label"><input %1$s type="' . $method . '" name="%2$s" id="%3$s" value="%4$s">%5$s</label>';
 					break;
 
 				case 'selectbox' :
@@ -220,11 +220,12 @@ class BP_XProfile_Field_Type_Relationship extends BP_XProfile_Field_Type {
 
 			$new_html = sprintf( $option_html,
 				$selected,
-				esc_attr( "field_{$this->field_obj->id}" . $checkbox ),
+				esc_attr( "field_{$this->field_obj->id}{$checkbox}" ),
 				esc_attr( "field_{$this->field_obj->id}_{$allowed_option}" ),
 				esc_attr( stripslashes( $option->id ) ),
 				esc_html( stripslashes( $option->name ) )
 			);
+
 			$html .= apply_filters( 'bp_get_the_profile_field_options_relationship', $new_html, $option, $this->field_obj->id, $selected, $k );
 		}
 
