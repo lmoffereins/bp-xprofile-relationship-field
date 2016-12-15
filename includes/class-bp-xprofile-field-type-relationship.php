@@ -331,7 +331,7 @@ class BP_XProfile_Field_Type_Relationship extends BP_XProfile_Field_Type {
 
 							<?php if ( isset( $details['options'] ) && ! empty( $details['options'] ) ) : ?>
 
-							<optgroup label="<?php echo $details['label']; ?>">
+							<optgroup label="<?php echo $details['category']; ?>">
 								<?php foreach ( $details['options'] as $_value => $label ) : ?>
 
 								<option value="<?php echo $_value; ?>" <?php selected( $current_field->related_to, $_value ); ?>>

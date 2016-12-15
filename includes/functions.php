@@ -58,14 +58,14 @@ function bp_xprofile_relationship_field_get_relationships() {
 
 		// Post Types
 		'post_type' => array(
-			'label'   => __( 'Post Types', 'bp-xprofile-relationship-field' ),
-			'options' => array_combine( $post_type_keys, $post_type_labels ),
+			'category' => __( 'Post Types', 'bp-xprofile-relationship-field' ),
+			'options'  => array_combine( $post_type_keys, $post_type_labels ),
 		),
 
 		// Taxonomies
 		'taxonomy' => array(
-			'label'   => __( 'Taxonomies', 'bp-xprofile-relationship-field' ),
-			'options' => array_combine( $taxonomy_keys, $taxonomy_labels),
+			'category' => __( 'Taxonomies', 'bp-xprofile-relationship-field' ),
+			'options'  => array_combine( $taxonomy_keys, $taxonomy_labels),
 		),
 
 		// Other WP Objects
