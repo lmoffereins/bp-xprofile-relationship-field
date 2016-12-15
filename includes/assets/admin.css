@@ -1,17 +1,22 @@
 /**
- * BP XProfile Relationship Field
+ * BP XProfile Relationship Field Administration Styles
  *
- * Admin Styles
+ * @package BP XProfile Relationship Field
+ * @subpackage Administration
  */
 
-/**** BP XProfile Field Group Main Administration Screens ****/
+/* XProfile Fields */
 
 fieldset.relationship div div label,
 fieldset.relationship div label {
 	margin-right: 20px;
 }
 
-/**** BP Members Profile Administration Screens ****/
+.form-table.bp-relationship-options th {
+	width: 150px;
+}
+
+/* Members: Extended Profile */
 
 .field_type_relationship > label,
 .field_type_relationship .radio > label,

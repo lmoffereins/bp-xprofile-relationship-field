@@ -290,6 +290,8 @@ class BP_XProfile_Field_Type_Relationship extends BP_XProfile_Field_Type {
 	 *
 	 * Must be used inside the {@link bp_profile_fields()} template loop.
 	 *
+	 * @see BP_XProfile_Field_Type::admin_new_field_html()
+	 *
 	 * @since 1.0.0
 	 *
 	 * @param BP_XProfile_Field $current_field The current profile field on the add/edit screen.
@@ -301,71 +303,118 @@ class BP_XProfile_Field_Type_Relationship extends BP_XProfile_Field_Type {
 			return;
 		}
 
-		// Setup meta values. Define class
+		// Define field details
 		$current_field = bp_xprofile_relationship_field()->populate_field( $current_field );
-		$class = $current_field->type != $type ? 'display: none;' : ''; ?>
+		$class         = $current_field->type != $type ? 'display: none;' : '';
 
-		<div id="<?php echo esc_attr( $type ); ?>" class="postbox bp-options-box" style="<?php echo esc_attr( $class ); ?> margin-top: 15px;">
-			<h3><?php esc_html_e( 'Settings for this Field:', 'bp-xprofile-relationship-field' ); ?></h3>
-			<div class="inside">
-				<p>
-					<label for="related_to_<?php echo esc_attr( $type ); ?>"><?php esc_html_e( 'Related To:', 'bp-xprofile-relationship-field' ); ?></label><br/>
-					<select name="related_to_<?php echo esc_attr( $type ); ?>" id="related_to_<?php echo esc_attr( $type ); ?>" style="max-width: 200px;">
-						<?php foreach ( bp_xprofile_relationship_field()->get_relationships() as $optgroup => $group_data ) {
+		// Define field meta ids
+		$esc_type      = esc_attr( $type );
+		$related_id    = "related_to_{$esc_type};";
+		$selection_id  = "selection_method_{$esc_type};";
+		$order_id      = "order_type_{$esc_type};"; // Confusing: BP uses 'sort_order' input field for 'order_by' field property
+		$sort_id       = "sort_order_{$esc_type};"; // Confusing: BP uses 'sort_order' input field for 'order_by' field property
 
-							// Skip empty optgroups
-							if ( empty( $group_data['options'] ) )
-								continue; ?>
+		?>
 
-						<optgroup label="<?php echo $group_data['label']; ?>">
-							<?php foreach ( $group_data['options'] as $value => $label ) : ?>
+		<div id="<?php echo $esc_type; ?>" class="postbox bp-options-box" style="<?php echo esc_attr( $class ); ?> margin-top: 15px;">
+			<h3><?php esc_html_e( 'Please enter options for this Field:', 'buddypress' ); ?></h3>
 
-							<option value="<?php echo $value ?>" <?php selected( $current_field->related_to, $value ); ?>><?php echo $label; ?></option>
+			<div class="inside" aria-live="polite" aria-atomic="true" aria-relevant="all">
+			<table class="form-table bp-relationship-options">
+				<tr>
+					<th scope="row">
+						<label for="<?php echo $related_id; ?>">
+							<?php esc_html_e( 'Related To', 'bp-xprofile-relationship-field' ); ?>
+						</label>
+					</th>
+
+					<td>
+						<select name="<?php echo $related_id; ?>" id="<?php echo $related_id; ?>" style="max-width: 200px;">
+							<?php foreach ( bp_xprofile_relationship_field()->get_relationships() as $value => $details ) : ?>
+
+							<?php if ( isset( $details['options'] ) && ! empty( $details['options'] ) ) : ?>
+
+							<optgroup label="<?php echo $details['label']; ?>">
+								<?php foreach ( $details['options'] as $_value => $label ) : ?>
+
+								<option value="<?php echo $_value; ?>" <?php selected( $current_field->related_to, $_value ); ?>>
+									<?php echo $label; ?>
+								</option>
+
+								<?php endforeach; ?>
+							</optgroup>
+
+							<?php else : ?>
+
+							<option value="<?php echo $value ?>" <?php selected( $current_field->related_to, $value ); ?>>
+								<?php echo $details; ?>
+							</option>
+
+							<?php endif; ?>
+							<?php endforeach; ?>
+						</select>
+					</td>
+				</tr>
+
+				<tr>
+					<th scope="row">
+						<label for="<?php echo $selection_id; ?>">
+							<?php esc_html_e( 'Selection Method', 'bp-xprofile-relationship-field' ); ?>
+						</label>
+					</th>
+
+					<td>
+						<select name="<?php echo $selection_id; ?>" id="<?php echo $selection_id; ?>" >
+							<optgroup label="<?php _ex( 'Single Fields', 'xprofile field type category', 'buddypress' ); ?>">
+								<option value="radio"     <?php selected( $current_field->selection_method, 'radio'     ); ?>><?php _ex( 'Radio Buttons',        'xprofile field type', 'buddypress' ); ?></option>
+								<option value="selectbox" <?php selected( $current_field->selection_method, 'selectbox' ); ?>><?php _ex( 'Drop Down Select Box', 'xprofile field type', 'buddypress' ); ?></option>
+							</optgroup>
+							<optgroup label="<?php _ex( 'Multi Fields', 'xprofile field type category', 'buddypress' ); ?>">
+								<option value="checkbox"       <?php selected( $current_field->selection_method, 'checkbox'       ); ?>><?php _ex( 'Checkboxes',       'xprofile field type', 'buddypress' ); ?></option>
+								<option value="multiselectbox" <?php selected( $current_field->selection_method, 'multiselectbox' ); ?>><?php _ex( 'Multi Select Box', 'xprofile field type', 'buddypress' ); ?></option>
+							</optgroup>
+						</select>
+					</td>
+				</tr>
+
+				<tr>
+					<th>
+						<label for="<?php echo $order_id; ?>">
+							<?php esc_html_e( 'Order By', 'bp-xprofile-relationship-field' ); ?>
+						</label>
+					</th>
+
+					<td>
+						<select name="<?php echo $order_id; ?>" id="<?php echo $order_id; ?>" >
+							<option value="default"><?php _e( '&mdash; Default Order &mdash;', 'bp-xprofile-relationship-field' ); ?></option>
+							<?php foreach ( bp_xprofile_relationship_field()->get_order_types() as $order => $label ) : ?>
+
+							<option value="<?php echo $order; ?>" <?php selected( $order, $current_field->order_type ); ?>><?php echo esc_html( $label ); ?></option>
 
 							<?php endforeach; ?>
-						</optgroup>
+						</select>
+					</td>
+				</tr>
 
-						<?php } ?>
-					</select>
-				</p>
+				<tr>
+					<th scope="row">
+						<label for="<?php echo $sort_id; ?>">
+							<?php esc_html_e( 'Sort Order', 'buddypress' ); ?>
+						</label>
+					</th>
 
-				<p>
-					<label for="selection_method_<?php echo esc_attr( $type ); ?>"><?php esc_html_e( 'Selection Method:', 'bp-xprofile-relationship-field' ); ?></label><br/>
-					<select name="selection_method_<?php echo esc_attr( $type ); ?>" id="selection_method_<?php echo esc_attr( $type ); ?>" >
-						<optgroup label="<?php _ex( 'Single Fields', 'xprofile field type category', 'buddypress' ); ?>">
-							<option value="radio"     <?php selected( $current_field->selection_method, 'radio'     ); ?>><?php _ex( 'Radio Buttons',        'xprofile field type', 'buddypress' ); ?></option>
-							<option value="selectbox" <?php selected( $current_field->selection_method, 'selectbox' ); ?>><?php _ex( 'Drop Down Select Box', 'xprofile field type', 'buddypress' ); ?></option>
-						</optgroup>
-						<optgroup label="<?php _ex( 'Multi Fields', 'xprofile field type category', 'buddypress' ); ?>">
-							<option value="checkbox"       <?php selected( $current_field->selection_method, 'checkbox'       ); ?>><?php _ex( 'Checkboxes',       'xprofile field type', 'buddypress' ); ?></option>
-							<option value="multiselectbox" <?php selected( $current_field->selection_method, 'multiselectbox' ); ?>><?php _ex( 'Multi Select Box', 'xprofile field type', 'buddypress' ); ?></option>
-						</optgroup>
-					</select>
-				</p>
+					<td>
+						<select name="<?php echo $sort_id; ?>" id="<?php echo $sort_id; ?>" >
+							<option value="default"><?php _e( '&mdash; Default Sort &mdash;', 'bp-xprofile-relationship-field' ); ?></option>
+							<option value="asc"  <?php selected( 'asc',  $current_field->order_by ); ?>><?php esc_html_e( 'Ascending',  'buddypress' ); ?></option>
+							<option value="desc" <?php selected( 'desc', $current_field->order_by ); ?>><?php esc_html_e( 'Descending', 'buddypress' ); ?></option>
+						</select>
+					</td>
+				</tr>
 
-				<p>
-					<?php /* A little confusing: BP uses 'sort_order' input field for 'order_by' field property */ ?>
-					<label for="order_type_<?php echo esc_attr( $type ); ?>"><?php esc_html_e( 'Order By:', 'bp-xprofile-relationship-field' ); ?></label><br/>
-					<select name="order_type_<?php echo esc_attr( $type ); ?>" id="order_type_<?php echo esc_attr( $type ); ?>" >
-						<option value="default"><?php _e( '&mdash; Default Order &mdash;', 'bp-xprofile-relationship-field' ); ?></option>
-						<?php foreach ( bp_xprofile_relationship_field()->get_order_types() as $order => $label ) : ?>
-
-						<option value="<?php echo $order; ?>" <?php selected( $order, $current_field->order_type ); ?>><?php echo esc_html( $label ); ?></option>
-
-						<?php endforeach; ?>
-					</select>
-				</p>
-
-				<p>
-					<?php /* A little confusing: BP uses 'sort_order' input field for 'order_by' field property */ ?>
-					<label for="sort_order_<?php echo esc_attr( $type ); ?>"><?php esc_html_e( 'Sort Order:', 'buddypress' ); ?></label><br/>
-					<select name="sort_order_<?php echo esc_attr( $type ); ?>" id="sort_order_<?php echo esc_attr( $type ); ?>" >
-						<option value="default"><?php _e( '&mdash; Default Sort &mdash;', 'bp-xprofile-relationship-field' ); ?></option>
-						<option value="asc"  <?php selected( 'asc',  $current_field->order_by ); ?>><?php esc_html_e( 'Ascending',  'buddypress' ); ?></option>
-						<option value="desc" <?php selected( 'desc', $current_field->order_by ); ?>><?php esc_html_e( 'Descending', 'buddypress' ); ?></option>
-					</select>
-				</p>
+			</table>
 			</div>
+
 		</div>
 
 		<?php
