@@ -183,7 +183,7 @@ final class BP_XProfile_Relationship_Field {
 
 		// Add field type
 		if ( class_exists( 'BP_XProfile_Field_Type_Relationship' ) ) {
-			$fields[ $this->type ] = 'BP_XProfile_Field_Type_Relationship';
+			$fields[ bp_xprofile_relationship_field_type() ] = 'BP_XProfile_Field_Type_Relationship';
 		}
 
 		return $fields;
@@ -354,7 +354,7 @@ final class BP_XProfile_Relationship_Field {
 	public function display_field( $field_value, $field_type, $field_id = 0 ) {
 
 		// Bail when this is not a relationship field
-		if ( $field_type !== $this->type ) {
+		if ( bp_xprofile_relationship_field_type() !== $field_type ) {
 			return $field_value;
 		}
 
@@ -466,7 +466,7 @@ final class BP_XProfile_Relationship_Field {
 	public function save_field( $field ) {
 
 		// Type is posted escaped
-		$type = esc_attr( $this->type );
+		$type = esc_attr( bp_xprofile_relationship_field_type() );
 
 		// Save field meta
 		foreach ( $this->get_meta_keys() as $meta ) {

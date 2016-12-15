@@ -11,6 +11,17 @@
 defined( 'ABSPATH' ) || exit;
 
 /**
+ * Return the relationship field type
+ *
+ * @since 1.1.0
+ *
+ * @return string Relationship field type
+ */
+function bp_xprofile_relationship_field_type() {
+	return bp_xprofile_relationship_field()->type;
+}
+
+/**
  * Return all the possible object relationships
  *
  * @since 1.0.0
