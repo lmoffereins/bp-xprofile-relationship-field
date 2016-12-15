@@ -87,6 +87,10 @@ final class BP_XProfile_Relationship_Field {
 		$this->includes_dir = trailingslashit( $this->plugin_dir . 'includes' );
 		$this->includes_url = trailingslashit( $this->plugin_url . 'includes' );
 
+		// Assets
+		$this->assets_dir   = trailingslashit( $this->plugin_dir . 'assets' );
+		$this->assets_url   = trailingslashit( $this->plugin_url . 'assets' );
+
 		// Languages
 		$this->lang_dir     = trailingslashit( $this->plugin_dir . 'languages' );
 
@@ -475,7 +479,7 @@ final class BP_XProfile_Relationship_Field {
 		if ( empty( $_GET['page'] ) || ! in_array( $_GET['page'], array( 'bp-profile-setup', 'bp-profile-edit' ) ) )
 			return;
 
-		wp_enqueue_style( 'bp-xprofile-relationship-field', $this->includes_url . 'assets/admin.css', array(), $this->version );
+		wp_enqueue_style( 'bp-xprofile-relationship-field', $this->assets_url . 'admin.css', array( 'xprofile-admin-css' ), $this->version );
 	}
 
 	/** BP_XProfile_Field *****************************************************/
