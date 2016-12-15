@@ -40,12 +40,12 @@ class BP_XProfile_Field_Type_Relationship extends BP_XProfile_Field_Type {
 	/**
 	 * Output the edit field HTML for this field type
 	 *
-	 * Must be used inside the {@link bp_profile_fields()} template loop.
+	 * Must be used inside the {@see bp_profile_fields()} template loop.
 	 *
 	 * @since 1.0.0
 	 *
 	 * @param array $raw_properties Optional key/value array of
-	 *                              {@see http://dev.w3.org/html5/markup/input.checkbox.html permitted attributes}
+	 *                              {@link http://dev.w3.org/html5/markup/input.checkbox.html permitted attributes}
 	 *                              that you want to add.
 	 */
 	public function edit_field_html( array $raw_properties = array() ) {
@@ -55,26 +55,26 @@ class BP_XProfile_Field_Type_Relationship extends BP_XProfile_Field_Type {
 		$method  = bp_xprofile_get_meta( bp_get_the_profile_field_id(), 'field', 'selection_method' );
 		$args    = array();
 
-		// user_id is a special optional parameter that we pass to {@link bp_the_profile_field_options()}.
+		// user_id is a special optional parameter that we pass to {@see bp_the_profile_field_options()}.
 		if ( isset( $raw_properties['user_id'] ) ) {
 			$user_id = (int) $raw_properties['user_id'];
 			unset( $raw_properties['user_id'] );
 		}
 
-		// Setup selection method
-		switch ( $method ) {
+		// Display field for (multi)selectbox
+		if ( 'selectbox' === $method || 'multiselectbox' === $method ) {
 
 			// Multiselect
-			case 'multiselectbox' :
+			if ( 'multiselectbox' === $method ) {
 				$args['multiple'] = 'multiple';
+			}
 
 			// Select
-			case 'selectbox' :
-				$multi        = isset( $args['multiple'] ) ? '[]' : '';
-				$args['name'] = bp_get_the_profile_field_input_name() . $multi;
-				$args['id']   = bp_get_the_profile_field_input_name() . $multi;
+			$multiple     = isset( $args['multiple'] ) ? '[]' : '';
+			$args['name'] = bp_get_the_profile_field_input_name() . $multiple;
+			$args['id']   = bp_get_the_profile_field_input_name() . $multiple;
 
-				$html = $this->get_edit_field_html_elements( array_merge( $args, $raw_properties ) ); ?>
+			?>
 
 			<label for="<?php echo $args['name']; ?>">
 				<?php bp_the_profile_field_name(); ?>
@@ -86,27 +86,20 @@ class BP_XProfile_Field_Type_Relationship extends BP_XProfile_Field_Type {
 			/** This action is documented in bp-xprofile/bp-xprofile-classes */
 			do_action( bp_get_the_profile_field_errors_action() ); ?>
 
-			<select <?php echo $html; ?>>
-				<?php bp_the_profile_field_options( array(
-					'user_id' => $user_id
-				) ); ?>
+			<select <?php echo $this->get_edit_field_html_elements( array_merge( $args, $raw_properties ) ); ?>>
+				<?php bp_the_profile_field_options( array( 'user_id' => $user_id ) ); ?>
 			</select>
 
-			<?php if ( isset( $args['multiple'] ) && ! bp_get_the_profile_field_is_required() ) : ?>
+			<?php if ( 'multiselectbox' === $method && ! bp_get_the_profile_field_is_required() ) : ?>
 
 				<a class="clear-value" href="javascript:clear( '<?php echo esc_js( bp_get_the_profile_field_input_name() ); ?>[]' );">
 					<?php esc_html_e( 'Clear', 'buddypress' ); ?>
 				</a>
 
-			<?php endif; ?>
+			<?php endif;
 
-				<?php
-				break;
-
-			// Radio
-			case 'checkbox' :
-			// Checkbox
-			case 'radio' : ?>
+		// Display field for radio/checkbox
+		} elseif ( 'radio' === $method || 'checkbox' === $method ) { ?>
 
 			<fieldset class="<?php echo $method; ?>">
 
@@ -120,11 +113,9 @@ class BP_XProfile_Field_Type_Relationship extends BP_XProfile_Field_Type {
 				/** This action is documented in bp-xprofile/bp-xprofile-classes */
 				do_action( bp_get_the_profile_field_errors_action() ); ?>
 
-				<?php bp_the_profile_field_options( array(
-					'user_id' => $user_id
-				) ); ?>
+				<?php bp_the_profile_field_options( array( 'user_id' => $user_id ) ); ?>
 
-				<?php if ( 'radio' == $method && ! bp_get_the_profile_field_is_required() ) : ?>
+				<?php if ( 'radio' === $method && ! bp_get_the_profile_field_is_required() ) : ?>
 
 					<a class="clear-value" href="javascript:clear( '<?php echo esc_js( bp_get_the_profile_field_input_name() ); ?>' );">
 						<?php esc_html_e( 'Clear', 'buddypress' ); ?>
@@ -134,8 +125,7 @@ class BP_XProfile_Field_Type_Relationship extends BP_XProfile_Field_Type {
 
 			</fieldset>
 
-				<?php
-				break;
+			<?php
 		}
 	}
 
@@ -152,6 +142,8 @@ class BP_XProfile_Field_Type_Relationship extends BP_XProfile_Field_Type {
 	 *
 	 * @since 1.0.0
 	 *
+	 * @uses apply_filters() Calls 'bp_get_the_profile_field_options_relationship'
+	 *
 	 * @param array $args Optional. The arguments passed to {@link bp_the_profile_field_options()}.
 	 */
 	public function edit_field_options_html( array $args = array() ) {
@@ -161,7 +153,7 @@ class BP_XProfile_Field_Type_Relationship extends BP_XProfile_Field_Type {
 
 		$html      = '';
 		$method    = $this->field_obj->selection_method;
-		$checkbox  = 'checkbox' == $method ? '[]' : '';
+		$checkbox  = 'checkbox' === $method ? '[]' : '';
 
 		// Check for updated posted values, but errors preventing them from being saved first time
 		if ( isset( $_POST['field_' . $this->field_obj->id] ) && $option_values != maybe_serialize( $_POST['field_' . $this->field_obj->id] ) ) {
@@ -186,38 +178,34 @@ class BP_XProfile_Field_Type_Relationship extends BP_XProfile_Field_Type {
 			} elseif ( in_array( sanitize_title( $option->name ), array_map( 'sanitize_title', $option_values ) ) ) {
 				$selected = true;
 			}
+				
+			// Build single option html for (multi)selectbox
+			if ( 'selectbox' === $method || 'multiselectbox' === $method ) {
 
-			// Build single option html
-			switch ( $method ) {
+				// Provide a null value before all other options
+				if ( 'selectbox' === $method && 0 === $k ) {
+					/* translators: no option picked in select box */
+					$html .= sprintf( '<option value="">%s</option>', esc_html__( '----', 'buddypress' ) );
+				}
 
-				case 'radio' :
-				case 'checkbox' :
+				if ( $selected ) {
+					$selected = ' selected="selected"';
+				}
 
-					if ( $selected )
-						$selected = ' checked="checked"';
+				// Relationships do not support defaults (yet).
 
-					// Relationships do not support defaults (yet).
+				$option_html = '<option %1$s value="%4$s">%5$s</option>';
 
-					$option_html = '<label for="%3$s" class="option-label"><input %1$s type="' . $method . '" name="%2$s" id="%3$s" value="%4$s">%5$s</label>';
-					break;
+			// Build single option html for radio/checkbox
+			} elseif ( 'radio' === $method || 'checkbox' === $method ) {
 
-				case 'selectbox' :
+				if ( $selected ) {
+					$selected = ' checked="checked"';
+				}
 
-					// Provide a null value before all other options
-					if ( 0 === $k ) {
-						/* translators: no option picked in select box */
-						$html .= sprintf( '<option value="">%s</option>', esc_html__( '----', 'buddypress' ) );
-					}
+				// Relationships do not support defaults (yet).
 
-				case 'multiselectbox' :
-
-					if ( $selected )
-						$selected = ' selected="selected"';
-
-					// Relationships do not support defaults (yet).
-
-					$option_html = '<option %1$s value="%4$s">%5$s</option>';
-					break;
+				$option_html = '<label for="%3$s" class="option-label"><input %1$s type="' . $method . '" name="%2$s" id="%3$s" value="%4$s">%5$s</label>';
 			}
 
 			$new_html = sprintf( $option_html,
@@ -228,6 +216,17 @@ class BP_XProfile_Field_Type_Relationship extends BP_XProfile_Field_Type {
 				esc_html( stripslashes( $option->name ) )
 			);
 
+			/**
+			 * Filters the HTML output for an individual field options checkbox.
+			 *
+			 * @since 1.0.0
+			 *
+			 * @param string $new_html Label and checkbox input field.
+			 * @param object $option   Current option being rendered for.
+			 * @param int    $id       ID of the field object being rendered.
+			 * @param string $selected Current selected value.
+			 * @param string $k        Current index in the foreach loop.
+			 */
 			$html .= apply_filters( 'bp_get_the_profile_field_options_relationship', $new_html, $option, $this->field_obj->id, $selected, $k );
 		}
 
@@ -244,45 +243,35 @@ class BP_XProfile_Field_Type_Relationship extends BP_XProfile_Field_Type {
 	 * @param array $raw_properties Optional key/value array of permitted attributes that you want to add.
 	 */
 	public function admin_field_html( array $raw_properties = array() ) {
+
+		// Get the field's selection method
 		$method = bp_xprofile_get_meta( bp_get_the_profile_field_id(), 'field', 'selection_method' );
 
 		// Pre-check selection methods
-		switch ( $method ) {
-			case 'multiselectbox' :
-				$raw_properties['multiple'] = 'multiple';
-			case 'selectbox' : ?>
+		if ( 'multiselectbox' === $method )  {
+			$raw_properties['multiple'] = 'multiple';
+		}
 
-			<select <?php echo $this->get_edit_field_html_elements( $raw_properties ); ?>>
-
-				<?php
-				break;
+		// Open (multi)selectbox
+		if ( 'selectbox' === $method || 'multiselectbox' === $method ) {
+			echo '<select ' . $this->get_edit_field_html_elements( $raw_properties ) . '>';
 		}
 
 		// Output the field options
 		bp_the_profile_field_options();
 
-		// Post-check selection methods
-		switch ( $method ) {
-			case 'selectbox' :
-			case 'multiselectbox' : ?>
+		// Close (multi)selectbox
+		if ( 'selectbox' === $method || 'multiselectbox' === $method ) {
+			echo '</select>';
+		}
 
-			</select>
+		// Display 'Clear' toggle for non-required fields
+		if ( ( 'radio' === $method || 'multiselectbox' === $method ) && ! bp_get_the_profile_field_is_required() ) {
+			$multiple = isset( $raw_properties['multiple'] ) ? '[]' : ''; ?>
 
-				<?php
+			<a class="clear-value" href="javascript:clear( '<?php echo esc_js( bp_get_the_profile_field_input_name() . $multiple ); ?>' );"><?php esc_html_e( 'Clear', 'buddypress' ); ?></a>
 
-				// Continue only for multiselectbox
-				if ( 'multiselectbox' != $method ) {
-					break;
-				}
-
-			case 'radio' :
-				$multi = isset( $raw_properties['multiple'] ) ? '[]' : '';
-
-				if ( ! bp_get_the_profile_field_is_required() ) : ?>
-					<a class="clear-value" href="javascript:clear( '<?php echo esc_js( bp_get_the_profile_field_input_name() . $multi ); ?>' );"><?php esc_html_e( 'Clear', 'buddypress' ); ?></a>
-				<?php endif;
-
-				break;
+			<?php
 		}
 	}
 
