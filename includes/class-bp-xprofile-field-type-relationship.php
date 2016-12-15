@@ -145,7 +145,7 @@ class BP_XProfile_Field_Type_Relationship extends BP_XProfile_Field_Type {
 	 * @param array $args Optional. The arguments passed to {@link bp_the_profile_field_options()}.
 	 */
 	public function edit_field_options_html( array $args = array() ) {
-		$options       = bp_xprofile_relationship_field()->get_field_options( $this->field_obj );
+		$options       = bp_xprofile_relationship_field_options( $this->field_obj );
 		$option_values = BP_XProfile_ProfileData::get_value_byid( $this->field_obj->id, $args['user_id'] );
 		$option_values = (array) maybe_unserialize( $option_values );
 
