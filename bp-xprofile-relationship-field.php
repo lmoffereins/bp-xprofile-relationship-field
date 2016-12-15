@@ -288,10 +288,14 @@ final class BP_XProfile_Relationship_Field {
 			case ( 'taxonomy-' == substr( $object, 0, 9 ) ) :
 				$taxonomy = substr( $object, 9 );
 
+				// Query all terms
+				$query_args['hide_empty'] = false;
+
 				// Query and list taxonomy terms
 				foreach ( get_terms( $taxonomy, $query_args ) as $term ) {
 					$options[] = (object) array( 'id' => $term->term_id, 'name' => $term->name );
 				}
+
 				break;
 
 			// Users
