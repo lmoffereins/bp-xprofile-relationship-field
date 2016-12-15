@@ -310,10 +310,10 @@ class BP_XProfile_Field_Type_Relationship extends BP_XProfile_Field_Type {
 
 		// Define field meta ids
 		$esc_type      = esc_attr( $type );
-		$related_id    = "related_to_{$esc_type};";
-		$selection_id  = "selection_method_{$esc_type};";
-		$order_id      = "order_type_{$esc_type};"; // Confusing: BP uses 'sort_order' input field for 'order_by' field property
-		$sort_id       = "sort_order_{$esc_type};"; // Confusing: BP uses 'sort_order' input field for 'order_by' field property
+		$related_id    = "related_to-{$esc_type};";
+		$selection_id  = "selection_method-{$esc_type};";
+		$order_id      = "order_type-{$esc_type};"; // Confusing: BP uses 'sort_order' input field for 'order_by' field property
+		$sort_id       = "sort_order-{$esc_type};"; // Confusing: BP uses 'sort_order' input field for 'order_by' field property
 
 		?>
 

@@ -690,11 +690,11 @@ final class BP_XProfile_Relationship_Field {
 
 		// Save field meta
 		foreach ( $this->get_meta_keys() as $meta ) {
-			if ( ! isset( $_POST[ $meta . '_' . $this->type ] ) )
+			if ( ! isset( $_POST[ $meta . '-' . $this->type ] ) )
 				continue;
 
 			// Update
-			bp_xprofile_update_meta( $field->id, 'field', $meta, $_POST[ $meta . '_' . $this->type ] );
+			bp_xprofile_update_meta( $field->id, 'field', $meta, $_POST[ $meta . '-' . $this->type ] );
 		}
 	}
 
