@@ -29,8 +29,9 @@ class BP_XProfile_Field_Type_Relationship extends BP_XProfile_Field_Type {
 		$this->category = _x( 'Multi Fields', 'xprofile field type category', 'buddypress' );
 		$this->name     = _x( 'Relationship', 'xprofile field type', 'bp-xprofile-relationship-field' );
 
-		$this->accepts_null_value = true;
-		$this->supports_options = false; // Has effect for select options that are saved in DB
+		$this->accepts_null_value  = true;
+		$this->supports_options    = false; // Has effect for select options that are saved in DB
+		$this->do_settings_section = true;
 
 		$this->set_format( '/^.+$/', 'replace' );
 		do_action( 'bp_xprofile_field_type_relationship', $this );
@@ -303,8 +304,6 @@ class BP_XProfile_Field_Type_Relationship extends BP_XProfile_Field_Type {
 		// Setup meta values. Define class
 		$current_field = bp_xprofile_relationship_field()->populate_field( $current_field );
 		$class = $current_field->type != $type ? 'display: none;' : ''; ?>
-
-		<script types="text/javascript">XProfileAdmin.supports_options_field_types.push( '<?php echo $type; ?>' );</script>
 
 		<div id="<?php echo esc_attr( $type ); ?>" class="postbox bp-options-box" style="<?php echo esc_attr( $class ); ?> margin-top: 15px;">
 			<h3><?php esc_html_e( 'Settings for this Field:', 'bp-xprofile-relationship-field' ); ?></h3>
