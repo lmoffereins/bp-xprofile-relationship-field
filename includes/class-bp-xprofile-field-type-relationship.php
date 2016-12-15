@@ -204,8 +204,9 @@ class BP_XProfile_Field_Type_Relationship extends BP_XProfile_Field_Type {
 				case 'selectbox' :
 
 					// Provide a null value before all other options
-					if ( 0 == $k ) {
-						$html .= sprintf( '<option value="0">%s</option>', __( '&mdash; Select &mdash;', 'bp-xprofile-relationship-field' ) );
+					if ( 0 === $k ) {
+						/* translators: no option picked in select box */
+						$html .= sprintf( '<option value="">%s</option>', esc_html__( '----', 'buddypress' ) );
 					}
 
 				case 'multiselectbox' :
