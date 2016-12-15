@@ -1,13 +1,13 @@
 === BP XProfile Relationship Field ===
 Contributors: Offereins
 Tags: buddypress, xprofile, profile, field, type, relationship, relation, objects
-Requires at least: 3.8, BP 2.1
-Tested up to: 4.5, BP 2.6
-Stable tag: 1.0.3
+Requires at least: 4.5, BP 2.7
+Tested up to: 4.7, BP 2.7
+Stable tag: 1.1.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Adds a 'relationship' profile field type to connect users to other objects
+Adds a relationship profile field type to connect members to other objects
 
 == Description ==
 
@@ -22,16 +22,18 @@ Use the Relationship profile field type to connect your members to other (WordPr
 
 This plugin is inspired by the Relationship type connector in Pods.
 
-This plugin requires BP 2.1 to be functional!
+This plugin requires BP 2.7 to be functional!
 
 == Installation ==
 
-1. Place the 'bp-xprofile-for-user-groups' folder in your '/wp-content/plugins/' directory.
-2. Activate BP XProfile Relationship Field.
-3. Visit the Profile Fields screen of Buddypress.
-4. Create a new profile field with the Relationship type.
+If you download BP XProfile Relationship Field manually, make sure it is uploaded to "/wp-content/plugins/bp-xprofile-relationship-field/".
+
+Activate BP XProfile Relationship Field in the "Plugins" admin panel using the "Activate" link. If you're using WordPress Multisite, you can choose to activate BP XProfile Relationship Field network wide for full integration with all of your sites.
 
 == Changelog ==
+
+= 1.1.0 =
+* Plugin now requires BP 2.7
 
 = 1.0.3 =
 * Added filtering of bp_get_member_field_data() and bp_get_profile_field_data()
