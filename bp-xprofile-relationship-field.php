@@ -189,29 +189,6 @@ final class BP_XProfile_Relationship_Field {
 		return $fields;
 	}
 
-	/**
-	 * Return the order types for the relationship field type
-	 *
-	 * @since 1.0.0
-	 *
-	 * @uses apply_filters() Calls 'bp_xprofile_relationship_field_order_types'
-	 * @return array Order types
-	 */
-	public function get_order_types() {
-
-		/**
-		 * Filter the order types for the relationship field type
-		 *
-		 * @since 1.0.0
-		 *
-		 * @param array $order_types Order types
-		 */
-		return apply_filters( 'bp_xprofile_relationship_field_order_types', array(
-			'name' => _x( 'Name', 'Object order type', 'bp-xprofile-relationship-field' ),
-			'date' => _x( 'Date', 'Object order type', 'bp-xprofile-relationship-field' ),
-		) );
-	}
-
 	/** Groups ****************************************************************/
 
 	/**

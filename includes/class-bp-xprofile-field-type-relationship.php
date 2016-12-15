@@ -384,7 +384,7 @@ class BP_XProfile_Field_Type_Relationship extends BP_XProfile_Field_Type {
 					<td>
 						<select name="<?php echo $order_id; ?>" id="<?php echo $order_id; ?>" >
 							<option value="default"><?php _e( '&mdash; Default Order &mdash;', 'bp-xprofile-relationship-field' ); ?></option>
-							<?php foreach ( bp_xprofile_relationship_field()->get_order_types() as $order => $label ) : ?>
+							<?php foreach ( bp_xprofile_relationship_field_order_types() as $order => $label ) : ?>
 
 							<option value="<?php echo $order; ?>" <?php selected( $order, $current_field->order_type ); ?>><?php echo esc_html( $label ); ?></option>
 
