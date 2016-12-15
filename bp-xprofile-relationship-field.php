@@ -103,10 +103,6 @@ final class BP_XProfile_Relationship_Field {
 	 */
 	private function setup_actions() {
 
-		// Bail when XProfile component is not active
-		if ( ! bp_is_active( 'xprofile' ) )
-			return;
-
 		// Plugin
 		add_action( 'init', array( $this, 'load_textdomain' ) );
 
@@ -728,7 +724,6 @@ function bp_xprofile_relationship_field() {
 }
 
 // Initiate when BP has loaded
-add_action( 'bp_loaded', 'bp_xprofile_relationship_field' );
+add_action( 'bp_xprofile_setup_actions', 'bp_xprofile_relationship_field' );
 
 endif; // class_exists
-
