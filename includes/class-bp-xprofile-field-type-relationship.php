@@ -26,7 +26,7 @@ class BP_XProfile_Field_Type_Relationship extends BP_XProfile_Field_Type {
 	public function __construct() {
 		parent::__construct();
 
-		$this->category = _x( 'Multi Fields', 'xprofile field type category', 'buddypress' );
+		$this->category = _x( 'Relationship', 'xprofile field type category', 'buddypress' );
 		$this->name     = _x( 'Relationship', 'xprofile field type', 'bp-xprofile-relationship-field' );
 
 		$this->accepts_null_value  = true;
