@@ -49,6 +49,7 @@ final class BP_XProfile_Relationship_Field {
 		if ( null === $instance ) {
 			$instance = new BP_XProfile_Relationship_Field;
 			$instance->setup_globals();
+			$instance->includes();
 			$instance->setup_actions();
 		}
 
@@ -91,7 +92,16 @@ final class BP_XProfile_Relationship_Field {
 
 		/** Plugin ***************************************************/
 
-		$this->domain = 'bp-xprofile-relationship-field';
+		$this->domain       = 'bp-xprofile-relationship-field';
+	}
+
+	/**
+	 * Include the required files
+	 *
+	 * @since 1.1.0
+	 */
+	private function includes() {
+		require( $this->includes_dir . 'functions.php' );
 	}
 
 	/**
@@ -176,69 +186,6 @@ final class BP_XProfile_Relationship_Field {
 	}
 
 	/**
-	 * Return all the possible object relationships
-	 *
-	 * @since 1.0.0
-	 *
-	 * @uses get_post_types()
-	 * @uses get_taxonomies()
-	 * @uses apply_filters() Calls 'bp_xprofile_relationship_field_relationships'
-	 * @return array Relationships
-	 */
-	public function get_relationships() {
-
-		// Post types
-		$post_types = get_post_types( array( 'publicly_queryable' => true ), 'objects' );
-		$post_type_keys   = array();
-		$post_type_labels = array();
-		foreach ( $post_types as $post_type ) {
-
-			// Attachments are handled separately
-			if ( 'attachment' == $post_type->name )
-				continue;
-
-			$post_type_keys[]   = 'post-type-' . $post_type->name;
-			$post_type_labels[] = $post_type->labels->name . ' ('. $post_type->name .')';
-		}
-
-		// Taxonomies
-		$taxonomies = get_taxonomies( array( 'public' => true ), 'objects' );
-		$taxonomy_keys   = array();
-		$taxonomy_labels = array();
-		foreach ( $taxonomies as $taxonomy ) {
-			$taxonomy_keys[]   = 'taxonomy-' . $taxonomy->name;
-			$taxonomy_labels[] = $taxonomy->labels->name . ' ('. $taxonomy->name .')';
-		}
-
-		// Setup and return all relationships
-		return apply_filters( 'bp_xprofile_relationship_field_relationships', array(
-
-			// Post Types
-			'post_type' => array(
-				'label'   => __( 'Post Types', 'bp-xprofile-relationship-field' ),
-				'options' => array_combine( $post_type_keys, $post_type_labels ),
-			),
-
-			// Taxonomies
-			'taxonomy' => array(
-				'label'   => __( 'Taxonomies', 'bp-xprofile-relationship-field' ),
-				'options' => array_combine( $taxonomy_keys, $taxonomy_labels),
-			),
-
-			// Other WP Objects
-			'other' => array(
-				'label'   => __( 'Other WP objects', 'bp-xprofile-relationship-field' ),
-				'options' => array(
-					'users'       => __( 'Users' ),
-					'roles'       => __( 'User Roles' ),
-					'comments'    => __( 'Comments' ),
-					// 'attachments' => __( 'Media' ),
-				)
-			)
-		) );
-	}
-
-	/**
 	 * Return the object's relationship field options
 	 *
 	 * @since 1.0.0
@@ -249,7 +196,7 @@ final class BP_XProfile_Relationship_Field {
 	public function get_field_options( $field ) {
 
 		// Get relationships
-		$relationships = array_keys( call_user_func_array( 'array_merge', wp_list_pluck( $this->get_relationships(), 'options' ) ) );
+		$relationships = array_keys( bp_xprofile_relationship_field_get_relationship_options() );
 
 		// Setup and fetch field meta
 		$field  = $this->populate_field( $field );

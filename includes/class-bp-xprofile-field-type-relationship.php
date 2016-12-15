@@ -320,7 +320,7 @@ class BP_XProfile_Field_Type_Relationship extends BP_XProfile_Field_Type {
 
 					<td>
 						<select name="<?php echo $related_id; ?>" id="<?php echo $related_id; ?>" style="max-width: 200px;">
-							<?php foreach ( bp_xprofile_relationship_field()->get_relationships() as $value => $details ) : ?>
+							<?php foreach ( bp_xprofile_relationship_field_get_relationships() as $value => $details ) : ?>
 
 							<?php if ( isset( $details['options'] ) && ! empty( $details['options'] ) ) : ?>
 
