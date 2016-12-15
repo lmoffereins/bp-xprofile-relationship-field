@@ -230,7 +230,16 @@ class BP_XProfile_Field_Type_Relationship extends BP_XProfile_Field_Type {
 			$html .= apply_filters( 'bp_get_the_profile_field_options_relationship', $new_html, $option, $this->field_obj->id, $selected, $k );
 		}
 
-		echo $html;
+		// Wrap radio/checkbox options
+		if ( 'radio' === $method || 'checkbox' === $method ) {
+			printf( '<div id="%1$s" class="input-options %3$s-options">%2$s</div>',
+				esc_attr( 'field_' . $this->field_obj->id ),
+				$html,
+				$method
+			);
+		} else {
+			echo $html;
+		}
 	}
 
 	/**
