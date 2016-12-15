@@ -21,7 +21,7 @@ defined( 'ABSPATH' ) || exit;
 function bp_xprofile_relationship_field_get_relationships() {
 
 	// Post types
-	$post_types = get_post_types( array( 'publicly_queryable' => true ), 'objects' );
+	$post_types       = get_post_types( array( 'publicly_queryable' => true ), 'objects' );
 	$post_type_keys   = array();
 	$post_type_labels = array();
 
@@ -37,7 +37,7 @@ function bp_xprofile_relationship_field_get_relationships() {
 	}
 
 	// Taxonomies
-	$taxonomies = get_taxonomies( array( 'public' => true ), 'objects' );
+	$taxonomies      = get_taxonomies( array( 'public' => true ), 'objects' );
 	$taxonomy_keys   = array();
 	$taxonomy_labels = array();
 
@@ -47,7 +47,13 @@ function bp_xprofile_relationship_field_get_relationships() {
 		$taxonomy_labels[] = $taxonomy->labels->name . ' ('. $taxonomy->name .')';
 	}
 
-	// Setup and return all relationships
+	/**
+	 * Filter all available relationship object options
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param array $objects Relationship object options
+	 */
 	return apply_filters( 'bp_xprofile_relationship_field_relationships', array(
 
 		// Post Types

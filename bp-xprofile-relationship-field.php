@@ -9,7 +9,7 @@
 
 /**
  * Plugin Name:       BP XProfile Relationship Field
- * Description:       Adds a 'relationship' profile field type to BuddyPress to connect users with other objects
+ * Description:       Add a relationship profile field type to BuddyPress to connect members with other objects
  * Plugin URI:        https://github.com/lmoffereins/bp-xprofile-relationship-field
  * Version:           1.0.3
  * Author:            Laurens Offereins
@@ -112,8 +112,6 @@ final class BP_XProfile_Relationship_Field {
 	 * Setup the default hooks and actions
 	 *
 	 * @since 1.0.0
-	 *
-	 * @uses bp_is_active() To check if xprofile component is active
 	 */
 	private function setup_actions() {
 
@@ -171,7 +169,7 @@ final class BP_XProfile_Relationship_Field {
 	/** Public Methods ********************************************************/
 
 	/**
-	 * Add the relationship field type to BP's xprofile field types
+	 * Register the relationship field type
 	 *
 	 * @since 1.0.0
 	 *
@@ -184,7 +182,9 @@ final class BP_XProfile_Relationship_Field {
 		require_once( $this->includes_dir . 'class-bp-xprofile-field-type-relationship.php' );
 
 		// Add field type
-		$fields[ $this->type ] = 'BP_XProfile_Field_Type_Relationship';
+		if ( class_exists( 'BP_XProfile_Field_Type_Relationship' ) ) {
+			$fields[ $this->type ] = 'BP_XProfile_Field_Type_Relationship';
+		}
 
 		return $fields;
 	}
@@ -193,6 +193,9 @@ final class BP_XProfile_Relationship_Field {
 	 * Return the object's relationship field options
 	 *
 	 * @since 1.0.0
+	 *
+	 * @uses apply_filters() Calls 'bp_xprofile_get_relationship_field_options_custom'
+	 * @uses apply_filters() Calls 'bp_xprofile_get_relationship_field_options'
 	 *
 	 * @param BP_XProfile_Field $field Field object
 	 * @return array Relationship field options
@@ -223,7 +226,7 @@ final class BP_XProfile_Relationship_Field {
 		switch ( $object ) {
 
 			// Post Type
-			case ( 'post-type-' == substr( $object, 0, 10 ) ) :
+			case ( 'post-type-' === substr( $object, 0, 10 ) ) :
 				$query_args = array_merge( $query_args, array(
 					'post_type'      => substr( $object, 10 ),
 					'posts_per_page' => -1,
@@ -233,10 +236,11 @@ final class BP_XProfile_Relationship_Field {
 				foreach ( get_posts( $query_args ) as $post ) {
 					$options[] = (object) array( 'id' => $post->ID, 'name' => $post->post_title );
 				}
+
 				break;
 
 			// Taxonomy
-			case ( 'taxonomy-' == substr( $object, 0, 9 ) ) :
+			case ( 'taxonomy-' === substr( $object, 0, 9 ) ) :
 				$taxonomy = substr( $object, 9 );
 
 				// Query all terms
@@ -258,6 +262,7 @@ final class BP_XProfile_Relationship_Field {
 				foreach ( get_users( $query_args ) as $user ) {
 					$options[] = (object) array( 'id' => $user->ID, 'name' => $user->display_name );
 				}
+
 				break;
 
 			// Roles
@@ -282,6 +287,7 @@ final class BP_XProfile_Relationship_Field {
 				foreach ( $_roles as $role_id => $role ) {
 					$options[] = (object) array( 'id' => $role_id, 'name' => $role['name'] );
 				}
+
 				break;
 
 			// Comments
@@ -295,6 +301,7 @@ final class BP_XProfile_Relationship_Field {
 				foreach ( get_comments( $query_args ) as $comment ) {
 					$options[] = (object) array( 'id' => $comment->comment_ID, 'name' => $comment->comment_date ); // Post Title #num comment?
 				}
+
 				break;
 
 			// Attachments
@@ -302,12 +309,13 @@ final class BP_XProfile_Relationship_Field {
 				// To come...
 				break;
 
-			// Custom
+			// Custom relationship type
 			default :
+
 				/**
 				 * Filter options to support custom relationship types
 				 *
-				 * Requires options to be objects that have at least an 'id' and 'name' property.
+				 * Requires options to be an array of objects having at least an 'id' and 'name' property.
 				 *
 				 * @since 1.0.0
 				 *
@@ -315,12 +323,22 @@ final class BP_XProfile_Relationship_Field {
 				 * @param string $object The relationship object type
 				 * @param BP_XProfile_Field $field The current field object
 				 * @param array $query_args The items query args like 'orderby' and 'order'
-				 * @return array Relationship options
 				 */
-				$options = apply_filters( 'bp_xprofile_get_relationship_field_options_custom', $options, $object, $field, $query_args );
-				break;
+				$options = (array) apply_filters( "bp_xprofile_get_relationship_field_{object}_options", $options, $object, $field, $query_args );
 		}
 
+		/**
+		 * Filter options for the relationship field type
+		 *
+		 * Requires options to be an array of objects having at least an 'id' and 'name' property.
+		 *
+		 * @since 1.0.0
+		 *
+		 * @param array $options The relationship options
+		 * @param string $object The relationship object type
+		 * @param BP_XProfile_Field $field The current field object
+		 * @param array $query_args The items query args like 'orderby' and 'order'
+		 */
 		return (array) apply_filters( 'bp_xprofile_get_relationship_field_options', $options, $object, $field, $query_args );
 	}
 
@@ -328,6 +346,8 @@ final class BP_XProfile_Relationship_Field {
 	 * Return the single field option display value
 	 *
 	 * @since 1.0.0
+	 *
+	 * @uses apply_filters() Calls 'bp_xprofile_relationship_field_option_value'
 	 *
 	 * @param object $option The option to display
 	 * @param object $field Field object
@@ -408,17 +428,37 @@ final class BP_XProfile_Relationship_Field {
 				break;
 		}
 
+		/**
+		 * Filter the display value of a single relationship field option
+		 *
+		 * This could be the value of one of many field options.
+		 *
+		 * @since 1.0.0
+		 *
+		 * @param object $option The single field option with 'id' and 'name' properties.
+		 * @param BP_XProfile_Field $field The current field object
+		 * @param string $value Display value of the option
+		 */
 		return apply_filters( 'bp_xprofile_relationship_field_option_value', $value, $option, $field );
 	}
 
 	/**
-	 * Return the order types for the relationship field
+	 * Return the order types for the relationship field type
 	 *
 	 * @since 1.0.0
 	 *
+	 * @uses apply_filters() Calls 'bp_xprofile_relationship_field_order_types'
 	 * @return array Order types
 	 */
 	public function get_order_types() {
+
+		/**
+		 * Filter the order types for the relationship field type
+		 *
+		 * @since 1.0.0
+		 *
+		 * @param array $order_types Order types
+		 */
 		return apply_filters( 'bp_xprofile_relationship_field_order_types', array(
 			'name' => _x( 'Name', 'Object order type', 'bp-xprofile-relationship-field' ),
 			'date' => _x( 'Date', 'Object order type', 'bp-xprofile-relationship-field' ),
@@ -496,8 +536,6 @@ final class BP_XProfile_Relationship_Field {
 	 * Enqueue styles and scripts for the admin pages
 	 *
 	 * @since 1.0.0
-	 *
-	 * @uses wp_enqueue_style()
 	 */
 	public function admin_enqueue_scripts() {
 
@@ -519,7 +557,15 @@ final class BP_XProfile_Relationship_Field {
 	 * @return array Meta keys
 	 */
 	public function get_meta_keys() {
-		return apply_filters( 'bp_xprofile_relationship_field_meta_keys', array(
+
+		/**
+		 * Filter the available field meta keys for the relationship field type
+		 *
+		 * @since 1.0.0
+		 *
+		 * @param array $meta_keys The relationship field meta keys
+		 */
+		return (array) apply_filters( 'bp_xprofile_relationship_field_meta_keys', array(
 			'related_to',
 			'selection_method',
 			'order_type', // For order_by value
@@ -527,13 +573,12 @@ final class BP_XProfile_Relationship_Field {
 	}
 
 	/**
-	 * Setup field meta on object population
+	 * Setup field meta on field object population
 	 *
 	 * @since 1.0.0
 	 *
-	 * @uses BP_XProfile_Relationship_Field::get_meta_keys()
-	 * @uses bp_xprofile_get_meta()
 	 * @param BP_XProfile_Field $field Field object
+	 * @return BP_XProfile_Field Field object
 	 */
 	public function populate_field( $field ) {
 
@@ -550,8 +595,8 @@ final class BP_XProfile_Relationship_Field {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @uses BP_XProfile_Relationship_Field::get_field_options()
-	 * @uses BP_XProfile_Relationship_Field::get_field_option_value()
+	 * @global BP_XProfile_Field $field
+	 *
 	 * @uses apply_filters() Calls 'bp_xprofile_relationship_field_display_value'
 	 *
 	 * @param string $field_value Field value
@@ -559,12 +604,19 @@ final class BP_XProfile_Relationship_Field {
 	 * @param int $field_id Field id
 	 * @return string Field display value
 	 */
-	public function display_field( $field_value, $field_type, $field_id ) {
-		global $field;
+	public function display_field( $field_value, $field_type, $field_id = 0 ) {
 
 		// Bail when this is not a relationship field
-		if ( $field_type != $this->type )
+		if ( $field_type !== $this->type ) {
 			return $field_value;
+		}
+
+		// Get field. Default to the global field
+		if ( ! empty( $field_id ) ) {
+			$field = xprofile_get_field( $field_id );
+		} else {
+			$field = $GLOBALS['field'];
+		}
 
 		// Get possible field values
 		$options = $this->get_field_options( $field );
@@ -603,22 +655,25 @@ final class BP_XProfile_Relationship_Field {
 
 		$values = implode( ', ', $new_values );
 
+		/**
+		 * Filter the total display value of the relationship field
+		 *
+		 * @since 1.0.0
+		 *
+		 * @param string $values Field display value
+		 * @param BP_XProfile_Field $field The current field object
+		 */
 		return apply_filters( 'bp_xprofile_relationship_field_display_value', $values, $field );
 	}
 
 	/**
 	 * Display field data
 	 *
-	 * Filters {@link bp_get_member_field_data()} and {@link bp_get_profile_field_data()} as per BP 2.6.
+	 * Filters {@see bp_get_member_field_data()} and {@see bp_get_profile_field_data()} as per BP 2.6.
 	 *
 	 * @since 1.0.3
 	 *
 	 * @global BP_XProfile_Field $field
-	 *
-	 * @uses xprofile_get_field()
-	 * @uses xprofile_get_field_id_from_name()
-	 * @uses BP_XProfile_Field::get_field_data()
-	 * @uses BP_XProfile_Relationship_Field::display_field()
 	 *
 	 * @param mixed $data Field data
 	 * @param array $args Field data arguments
@@ -659,19 +714,22 @@ final class BP_XProfile_Relationship_Field {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @uses BP_XProfile_Relationship_Field::get_meta_keys()
-	 * @uses bp_xprofile_update_meta()
 	 * @param BP_XProfile_Field $field Field object
 	 */
 	public function save_field( $field ) {
 
+		// Type is posted escaped
+		$type = esc_attr( $this->type );
+
 		// Save field meta
 		foreach ( $this->get_meta_keys() as $meta ) {
-			if ( ! isset( $_POST[ $meta . '-' . $this->type ] ) )
+
+			// Skip when the option was not posted
+			if ( ! isset( $_POST[ "{$meta}-{$type}" ] ) )
 				continue;
 
 			// Update
-			bp_xprofile_update_meta( $field->id, 'field', $meta, $_POST[ $meta . '-' . $this->type ] );
+			bp_xprofile_update_meta( $field->id, 'field', $meta, $_POST[ "{$meta}-{$type}" ] );
 		}
 	}
 
@@ -680,8 +738,6 @@ final class BP_XProfile_Relationship_Field {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @uses BP_XProfile_Relationship_Field::get_meta_keys()
-	 * @uses bp_xprofile_delete_meta()
 	 * @param BP_XProfile_Field $field Field object
 	 */
 	public function delete_field( $field ) {

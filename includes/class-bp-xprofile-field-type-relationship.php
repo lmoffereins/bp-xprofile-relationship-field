@@ -142,7 +142,6 @@ class BP_XProfile_Field_Type_Relationship extends BP_XProfile_Field_Type {
 	 * @since 1.0.0
 	 *
 	 * @uses apply_filters() Calls 'bp_get_the_profile_field_options_relationship'
-	 *
 	 * @param array $args Optional. The arguments passed to {@link bp_the_profile_field_options()}.
 	 */
 	public function edit_field_options_html( array $args = array() ) {
