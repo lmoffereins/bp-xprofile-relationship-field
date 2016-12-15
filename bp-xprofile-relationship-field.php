@@ -341,17 +341,17 @@ final class BP_XProfile_Relationship_Field {
 
 		// Use global field if not provided
 		if ( empty( $field ) ) {
-			global $field;
+			$field = $GLOBALS['field'];
 		}
 
-		// Default value to option name
+		// Default to the option's name
 		$value = $option->name;
 
 		// Check field type
 		switch ( $field->related_to ) {
 
 			// Post Type
-			case ( 'post-type-' == substr( $field->related_to, 0, 10 ) ) :
+			case ( 'post-type-' === substr( $field->related_to, 0, 10 ) ) :
 
 				// Link posts to their respective pages
 				$value = sprintf( '<a href="%s" title="%s">%s</a>',
@@ -359,22 +359,48 @@ final class BP_XProfile_Relationship_Field {
 					sprintf( __( 'Permalink to %s', 'bp-xprofile-relationship-field' ), $option->name ),
 					$option->name
 				);
+
 				break;
 
 			// Taxonomy
-			case ( 'taxonomy-' == substr( $field->related_to, 0, 9 ) ) :
+			case ( 'taxonomy-' === substr( $field->related_to, 0, 9 ) ) :
+				$taxonomy = get_taxonomy( substr( $field->related_to, 9 ) );
+
+				// When the taxonomy has an archive, link the term
+				if ( $taxonomy->query_var ) {
+
+					// Link terms to their respective pages
+					$value = sprintf( '<a href="%s" title="%s">%s</a>',
+						get_term_link( $option->id ),
+						sprintf( __( 'Permalink to %s', 'bp-xprofile-relationship-field' ), $option->name ),
+						$option->name
+					);
+				}
+
 				break;
 
 			// Users
 			case 'users' :
-				break;
 
-			// Roles
-			case 'roles' :
+				// Link user to the member's profile
+				$value = sprintf( '<a href="%s" title="%s">%s</a>',
+					bp_core_get_user_domain( $option->id ),
+					sprintf( __( 'Visit the profile of %s', 'bp-xprofile-relationship-field' ), $option->name ),
+					$option->name
+				);
+
 				break;
 
 			// Comments
 			case 'comments' :
+
+				// Link comment to it's location
+				$value = sprintf( '<a href="%s" title="%s">%s</a>',
+					get_comment_link( $option->id ),
+					sprintf( __( 'Permalink to %s', 'bp-xprofile-relationship-field' ), $option->name ),
+					$option->name
+				);
+
 				break;
 
 			// Attachments
