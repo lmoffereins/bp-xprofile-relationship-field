@@ -449,11 +449,11 @@ final class BP_XProfile_Relationship_Field {
 		foreach ( $this->get_meta_keys() as $meta ) {
 
 			// Skip when the option was not posted
-			if ( ! isset( $_POST[ "{$meta}-{$type}" ] ) )
+			if ( ! isset( $_POST[ "{$meta}_{$type}" ] ) )
 				continue;
 
 			// Update
-			bp_xprofile_update_meta( $field->id, 'field', $meta, $_POST[ "{$meta}-{$type}" ] );
+			bp_xprofile_update_meta( $field->id, 'field', $meta, $_POST[ "{$meta}_{$type}" ] );
 		}
 	}
 
