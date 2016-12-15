@@ -99,3 +99,267 @@ function bp_xprofile_relationship_field_get_relationship_options() {
 
 	return $options;
 }
+
+/**
+ * Return the object's relationship field options
+ *
+ * @since 1.0.0
+ *
+ * @uses apply_filters() Calls 'bp_xprofile_get_relationship_field_options_query_args'
+ * @uses apply_filters() Calls 'bp_xprofile_get_relationship_field_{$object}_options'
+ * @uses apply_filters() Calls 'bp_xprofile_get_relationship_field_options'
+ *
+ * @param BP_XProfile_Field $field Field object
+ * @return array Relationship field options
+ */
+function bp_xprofile_relationship_field_options( $field ) {
+
+	// Get relationships
+	$relationships = array_keys( bp_xprofile_relationship_field_get_relationship_options() );
+
+	// Setup and fetch field meta
+	$field  = bp_xprofile_relationship_field()->populate_field( $field );
+	$object = $field->related_to;
+
+	// Bail when object does not exist
+	if ( empty( $object ) || ! in_array( $object, $relationships ) )
+		return array();
+
+	// Setup option vars
+	$options = array();
+	$orderby = $field->order_type;
+	$order   = $field->order_by;
+
+	/**
+	 * Filter options to support custom relationship types
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param array $query_args The items query args like 'orderby' and 'order'
+	 * @param string $object The relationship object type
+	 * @param BP_XProfile_Field $field The current field object
+	 */
+	$query_args = apply_filters( 'bp_xprofile_relationship_field_options_query_args', array(
+		'orderby' => ( 'default' !== $orderby ) ? $orderby : '',
+		'order'   => empty( $order ) || ( 'DESC' !== strtoupper( $order ) ) ? 'ASC' : 'DESC',
+	), $object, $field );
+
+	// Check object to get the options
+	switch ( $object ) {
+
+		// Post Type
+		case ( 'post-type-' === substr( $object, 0, 10 ) ) :
+			$query_args = array_merge( $query_args, array(
+				'post_type'      => substr( $object, 10 ),
+				'posts_per_page' => -1,
+			) );
+
+			// Query and list posts
+			foreach ( get_posts( $query_args ) as $post ) {
+				$options[] = (object) array( 'id' => $post->ID, 'name' => $post->post_title );
+			}
+
+			break;
+
+		// Taxonomy
+		case ( 'taxonomy-' === substr( $object, 0, 9 ) ) :
+			$taxonomy = substr( $object, 9 );
+
+			// Query all terms
+			$query_args['hide_empty'] = false;
+
+			// Query and list taxonomy terms
+			foreach ( get_terms( $taxonomy, $query_args ) as $term ) {
+				$options[] = (object) array( 'id' => $term->term_id, 'name' => $term->name );
+			}
+
+			break;
+
+		// Users
+		case 'users' :
+			if ( 'date' == $orderby )
+				$query_args['orderby'] = 'user_registered';
+
+			// Query and list users
+			foreach ( get_users( $query_args ) as $user ) {
+				$options[] = (object) array( 'id' => $user->ID, 'name' => $user->display_name );
+			}
+
+			break;
+
+		// Roles
+		case 'roles' :
+			global $wp_roles;
+
+			// Fetch global roles
+			$_roles = $wp_roles->roles;
+			$_order = 'ASC' == $query_args['order'] ? SORT_ASC : SORT_DESC;
+
+			// Order roles
+			if ( 'name' == $orderby ) {
+				array_multisort( wp_list_pluck( $wp_roles->roles, 'name' ), $_order, SORT_STRING | SORT_FLAG_CASE, $_roles );
+
+			// Handle array sorting for default order
+			} else {
+				if ( SORT_DESC == $_order )
+					$_roles = array_reverse( $_roles );
+			}
+
+			// List roles
+			foreach ( $_roles as $role_id => $role ) {
+				$options[] = (object) array( 'id' => $role_id, 'name' => $role['name'] );
+			}
+
+			break;
+
+		// Comments
+		case 'comments' :
+
+			// Default 'name' and 'date' orderby to comment date
+			if ( in_array( $orderby, array( 'name', 'date' ) ) )
+				$query_args['orderby'] = 'comment_date';
+
+			// Query and list comments
+			foreach ( get_comments( $query_args ) as $comment ) {
+				$options[] = (object) array( 'id' => $comment->comment_ID, 'name' => $comment->comment_date ); // Post Title #num comment?
+			}
+
+			break;
+
+		// Attachments
+		case 'attachments' :
+			// To come...
+			break;
+
+		// Custom relationship type
+		default :
+
+			/**
+			 * Filter options to support custom relationship types
+			 *
+			 * Requires options to be an array of objects having at least an 'id' and 'name' property.
+			 *
+			 * @since 1.0.0
+			 *
+			 * @param array $options The relationship options
+			 * @param string $object The relationship object type
+			 * @param BP_XProfile_Field $field The current field object
+			 * @param array $query_args The items query args like 'orderby' and 'order'
+			 */
+			$options = (array) apply_filters( "bp_xprofile_get_relationship_field_{object}_options", $options, $object, $field, $query_args );
+	}
+
+	/**
+	 * Filter options for the relationship field type
+	 *
+	 * Requires options to be an array of objects having at least an 'id' and 'name' property.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param array $options The relationship options
+	 * @param string $object The relationship object type
+	 * @param BP_XProfile_Field $field The current field object
+	 * @param array $query_args The items query args like 'orderby' and 'order'
+	 */
+	return (array) apply_filters( 'bp_xprofile_get_relationship_field_options', $options, $object, $field, $query_args );
+}
+
+/**
+ * Return the single field option display value
+ *
+ * @since 1.0.0
+ *
+ * @uses apply_filters() Calls 'bp_xprofile_relationship_field_option_value'
+ *
+ * @param object $option The option to display
+ * @param object $field Field object
+ * @return string Option display value
+ */
+function bp_xprofile_relationship_field_option_value( $option, $field = '' ) {
+
+	// Bail when no valid option is provided
+	if ( empty( $option ) || ! isset( $option->id ) || ! isset( $option->name ) )
+		return '';
+
+	// Use global field if not provided
+	if ( empty( $field ) ) {
+		$field = $GLOBALS['field'];
+	}
+
+	// Default to the option's name
+	$value = $option->name;
+
+	// Check field type
+	switch ( $field->related_to ) {
+
+		// Post Type
+		case ( 'post-type-' === substr( $field->related_to, 0, 10 ) ) :
+
+			// Link posts to their respective pages
+			$value = sprintf( '<a href="%s" title="%s">%s</a>',
+				get_permalink( $option->id ),
+				sprintf( __( 'Permalink to %s', 'bp-xprofile-relationship-field' ), $option->name ),
+				$option->name
+			);
+
+			break;
+
+		// Taxonomy
+		case ( 'taxonomy-' === substr( $field->related_to, 0, 9 ) ) :
+			$taxonomy = get_taxonomy( substr( $field->related_to, 9 ) );
+
+			// When the taxonomy has an archive, link the term
+			if ( $taxonomy->query_var ) {
+
+				// Link terms to their respective pages
+				$value = sprintf( '<a href="%s" title="%s">%s</a>',
+					get_term_link( $option->id ),
+					sprintf( __( 'Permalink to %s', 'bp-xprofile-relationship-field' ), $option->name ),
+					$option->name
+				);
+			}
+
+			break;
+
+		// Users
+		case 'users' :
+
+			// Link user to the member's profile
+			$value = sprintf( '<a href="%s" title="%s">%s</a>',
+				bp_core_get_user_domain( $option->id ),
+				sprintf( __( 'Visit the profile of %s', 'bp-xprofile-relationship-field' ), $option->name ),
+				$option->name
+			);
+
+			break;
+
+		// Comments
+		case 'comments' :
+
+			// Link comment to it's location
+			$value = sprintf( '<a href="%s" title="%s">%s</a>',
+				get_comment_link( $option->id ),
+				sprintf( __( 'Permalink to %s', 'bp-xprofile-relationship-field' ), $option->name ),
+				$option->name
+			);
+
+			break;
+
+		// Attachments
+		case 'attachments' :
+			break;
+	}
+
+	/**
+	 * Filter the display value of a single relationship field option
+	 *
+	 * This could be the value of one of many field options.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param object $option The single field option with 'id' and 'name' properties.
+	 * @param BP_XProfile_Field $field The current field object
+	 * @param string $value Display value of the option
+	 */
+	return apply_filters( 'bp_xprofile_relationship_field_option_value', $value, $option, $field );
+}
