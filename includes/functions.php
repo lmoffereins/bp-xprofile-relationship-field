@@ -295,13 +295,17 @@ function bp_xprofile_relationship_field_option_value( $option, $field = '' ) {
 	if ( empty( $option ) || ! isset( $option->id ) || ! isset( $option->name ) )
 		return '';
 
-	// Use global field if not provided
-	if ( empty( $field ) ) {
-		$field = $GLOBALS['field'];
-	}
-
 	// Default to the option's name
 	$value = $option->name;
+
+	// Default to the global field
+	if ( empty( $field ) && isset( $GLOBALS['field'] ) ) {
+		$field = bp_xprofile_relationship_field()->populate_field( $GLOBALS['field'] );
+
+	// Bail when no field context is present
+	} else {
+		return $value;
+	}
 
 	// Check field type
 	switch ( $field->related_to ) {
