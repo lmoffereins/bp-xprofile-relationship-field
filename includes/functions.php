@@ -25,6 +25,7 @@ function bp_xprofile_relationship_field_type() {
  * Return all the possible object relationships
  *
  * @since 1.0.0
+ * @since 1.1.0 Moved to standalone function.
  *
  * @uses apply_filters() Calls 'bp_xprofile_relationship_field_relationships'
  * @return array Relationships
@@ -115,6 +116,7 @@ function bp_xprofile_relationship_field_get_relationship_options() {
  * Return the object's relationship field options
  *
  * @since 1.0.0
+ * @since 1.1.0 Moved to standalone function.
  *
  * @uses apply_filters() Calls 'bp_xprofile_get_relationship_field_options_query_args'
  * @uses apply_filters() Calls 'bp_xprofile_get_relationship_field_{$object}_options'
@@ -279,6 +281,7 @@ function bp_xprofile_relationship_field_options( $field ) {
  * Return the single field option display value
  *
  * @since 1.0.0
+ * @since 1.1.0 Moved to standalone function.
  *
  * @uses apply_filters() Calls 'bp_xprofile_relationship_field_option_value'
  *
@@ -379,6 +382,7 @@ function bp_xprofile_relationship_field_option_value( $option, $field = '' ) {
  * Return the order types for the relationship field type
  *
  * @since 1.0.0
+ * @since 1.1.0 Moved to standalone function.
  *
  * @uses apply_filters() Calls 'bp_xprofile_relationship_field_order_types'
  * @return array Order types
