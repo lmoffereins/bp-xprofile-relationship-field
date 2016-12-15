@@ -338,8 +338,10 @@ final class BP_XProfile_Relationship_Field {
 		// Get field. Default to the global field
 		if ( ! empty( $field_id ) ) {
 			$field = xprofile_get_field( $field_id );
-		} else {
+		} elseif ( isset( $GLOBALS['field'] ) ) {
 			$field = $GLOBALS['field'];
+		} else {
+			return $field_value;
 		}
 
 		// Get possible field values
