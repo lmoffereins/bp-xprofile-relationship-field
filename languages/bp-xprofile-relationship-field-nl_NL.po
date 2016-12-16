@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: BP XProfile Relationship Field\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-12-16 00:52+0000\n"
-"PO-Revision-Date: 2016-12-16 00:52+0000\n"
+"POT-Creation-Date: 2016-12-16 00:55+0000\n"
+"PO-Revision-Date: 2016-12-16 00:55+0000\n"
 "Last-Translator: laurens <lmoffereins@gmail.com>\n"
 "Language-Team: Dutch\n"
 "Language: nl-NL\n"
@@ -13,9 +13,10 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Loco - https://localise.biz/"
 
-#: includes/class-bp-xprofile-field-type-relationship.php:399
-msgid "Sort Order"
-msgstr "Sorteervolgorde"
+#: includes/class-bp-xprofile-field-type-relationship.php:386
+#: includes/class-bp-xprofile-field-type-relationship.php:405
+msgid "Default"
+msgstr "Standaard"
 
 #. URI of the plugin
 msgid "https://github.com/lmoffereins/bp-xprofile-relationship-field"
@@ -46,13 +47,9 @@ msgstr "Selectiewijze"
 msgid "Order By"
 msgstr "Sorteren op"
 
-#: includes/class-bp-xprofile-field-type-relationship.php:386
-msgid "&mdash; Default Order &mdash;"
-msgstr "&mdash; Standaard sortering &mdash;"
-
-#: includes/class-bp-xprofile-field-type-relationship.php:405
-msgid "&mdash; Default Sort &mdash;"
-msgstr "&mdash; Standaard volgorde &mdash;"
+#: includes/class-bp-xprofile-field-type-relationship.php:399
+msgid "Sort Order"
+msgstr "Sorteervolgorde"
 
 #: includes/functions.php:73
 msgid "Post Types"

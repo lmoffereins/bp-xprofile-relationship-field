@@ -383,7 +383,7 @@ class BP_XProfile_Field_Type_Relationship extends BP_XProfile_Field_Type {
 
 					<td>
 						<select name="<?php echo $order_id; ?>" id="<?php echo $order_id; ?>" >
-							<option value="default"><?php _e( '&mdash; Default Order &mdash;', 'bp-xprofile-relationship-field' ); ?></option>
+							<option value="default"><?php esc_html_e( 'Default', 'bp-xprofile-relationship-field' ); ?></option>
 							<?php foreach ( bp_xprofile_relationship_field_order_types() as $order => $label ) : ?>
 
 							<option value="<?php echo $order; ?>" <?php selected( $order, $current_field->order_type ); ?>><?php echo esc_html( $label ); ?></option>
@@ -402,7 +402,7 @@ class BP_XProfile_Field_Type_Relationship extends BP_XProfile_Field_Type {
 
 					<td>
 						<select name="<?php echo $sort_id; ?>" id="<?php echo $sort_id; ?>" >
-							<option value="default"><?php esc_html_e( '&mdash; Default Sort &mdash;', 'bp-xprofile-relationship-field' ); ?></option>
+							<option value="default"><?php esc_html_e( 'Default', 'bp-xprofile-relationship-field' ); ?></option>
 							<option value="asc"  <?php selected( 'asc',  $current_field->order_by ); ?>><?php esc_html_e( 'Ascending',  'buddypress' ); ?></option>
 							<option value="desc" <?php selected( 'desc', $current_field->order_by ); ?>><?php esc_html_e( 'Descending', 'buddypress' ); ?></option>
 						</select>
