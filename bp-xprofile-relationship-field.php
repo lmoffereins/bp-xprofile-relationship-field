@@ -158,11 +158,14 @@ final class BP_XProfile_Relationship_Field {
 		$mofile_local  = $this->lang_dir . $mofile;
 		$mofile_global = WP_LANG_DIR . '/bp-xprofile-relationship-field/' . $mofile;
 
-		// Look in global /wp-content/languages/bp-xprofile-relationship-field folder first
+		// Look in global /wp-content/languages/bp-xprofile-relationship-field folder
 		load_textdomain( $this->domain, $mofile_global );
 
-		// Look in global /wp-content/languages/plugins/ and local plugin languages folder
-		load_plugin_textdomain( $this->domain, false, 'bp-xprofile-relationship-field/languages' );
+		// Look in local /wp-content/plugins/bp-xprofile-relationship-field/languages/ folder
+		load_textdomain( $this->domain, $mofile_local );
+
+		// Look in global /wp-content/languages/plugins/
+		load_plugin_textdomain( $this->domain );
 	}
 
 	/** Public Methods ********************************************************/
