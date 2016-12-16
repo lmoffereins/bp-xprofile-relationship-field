@@ -1,0 +1,92 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: BP XProfile Relationship Field\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2016-12-16 00:27+0000\n"
+"PO-Revision-Date: 2016-12-16 00:30+0000\n"
+"Last-Translator: laurens <lmoffereins@gmail.com>\n"
+"Language-Team: Dutch\n"
+"Language: nl-NL\n"
+"Plural-Forms: nplurals=2; plural=n != 1\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Loco - https://localise.biz/"
+
+#: includes/class-bp-xprofile-field-type-relationship.php:29
+msgctxt "xprofile field type"
+msgid "Relationship"
+msgstr "Relatie"
+
+#: includes/class-bp-xprofile-field-type-relationship.php:324
+msgid "Related To"
+msgstr "Verbinden aan"
+
+#: includes/class-bp-xprofile-field-type-relationship.php:359
+msgid "Selection Method"
+msgstr "Selectiewijze"
+
+#: includes/class-bp-xprofile-field-type-relationship.php:380
+msgid "Order By"
+msgstr "Sorteren op"
+
+#: includes/class-bp-xprofile-field-type-relationship.php:386
+msgid "&mdash; Default Order &mdash;"
+msgstr "&mdash; Standaard sortering &mdash;"
+
+#: includes/class-bp-xprofile-field-type-relationship.php:405
+msgid "&mdash; Default Sort &mdash;"
+msgstr "&mdash; Standaard volgorde &mdash;"
+
+#: includes/functions.php:73
+msgid "Post Types"
+msgstr "Posttypen"
+
+#: includes/functions.php:79
+msgid "Taxonomies"
+msgstr "Taxonomiën"
+
+#: includes/functions.php:319 includes/functions.php:335
+#: includes/functions.php:360
+#, php-format
+msgid "Permalink to %s"
+msgstr "Link naar %s"
+
+#: includes/functions.php:348
+#, php-format
+msgid "Visit the profile of %s"
+msgstr "Ga naar het profiel van %s"
+
+#: includes/functions.php:404
+msgctxt "Object order type"
+msgid "Name"
+msgstr "Naam"
+
+#: includes/functions.php:405
+msgctxt "Object order type"
+msgid "Date"
+msgstr "Datum"
+
+#. Name of the plugin
+msgid "BP XProfile Relationship Field"
+msgstr "BP Uitgebreid Profiel Relatie Veld"
+
+#. Description of the plugin
+msgid ""
+"Add a relationship profile field type to BuddyPress to connect members with "
+"other objects"
+msgstr ""
+"Voeg een relatie profielveldtype toe aan BuddyPress om leden met andere "
+"objecten te verbinden"
+
+#. URI of the plugin
+msgid "https://github.com/lmoffereins/bp-xprofile-relationship-field"
+msgstr ""
+
+#. Author of the plugin
+msgid "Laurens Offereins"
+msgstr ""
+
+#. Author URI of the plugin
+msgid "https://github.com/lmoffereins"
+msgstr ""

@@ -1,0 +1,91 @@
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2016-12-16 00:27+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: \n"
+"Language: \n"
+"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Loco https://localise.biz/"
+
+#: includes/class-bp-xprofile-field-type-relationship.php:29
+msgctxt "xprofile field type"
+msgid "Relationship"
+msgstr ""
+
+#: includes/class-bp-xprofile-field-type-relationship.php:324
+msgid "Related To"
+msgstr ""
+
+#: includes/class-bp-xprofile-field-type-relationship.php:359
+msgid "Selection Method"
+msgstr ""
+
+#: includes/class-bp-xprofile-field-type-relationship.php:380
+msgid "Order By"
+msgstr ""
+
+#: includes/class-bp-xprofile-field-type-relationship.php:386
+msgid "&mdash; Default Order &mdash;"
+msgstr ""
+
+#: includes/class-bp-xprofile-field-type-relationship.php:405
+msgid "&mdash; Default Sort &mdash;"
+msgstr ""
+
+#: includes/functions.php:73
+msgid "Post Types"
+msgstr ""
+
+#: includes/functions.php:79
+msgid "Taxonomies"
+msgstr ""
+
+#: includes/functions.php:319 includes/functions.php:335
+#: includes/functions.php:360
+#, php-format
+msgid "Permalink to %s"
+msgstr ""
+
+#: includes/functions.php:348
+#, php-format
+msgid "Visit the profile of %s"
+msgstr ""
+
+#: includes/functions.php:404
+msgctxt "Object order type"
+msgid "Name"
+msgstr ""
+
+#: includes/functions.php:405
+msgctxt "Object order type"
+msgid "Date"
+msgstr ""
+
+#. Name of the plugin
+msgid "BP XProfile Relationship Field"
+msgstr ""
+
+#. Description of the plugin
+msgid ""
+"Add a relationship profile field type to BuddyPress to connect members with "
+"other objects"
+msgstr ""
+
+#. URI of the plugin
+msgid "https://github.com/lmoffereins/bp-xprofile-relationship-field"
+msgstr ""
+
+#. Author of the plugin
+msgid "Laurens Offereins"
+msgstr ""
+
+#. Author URI of the plugin
+msgid "https://github.com/lmoffereins"
+msgstr ""
