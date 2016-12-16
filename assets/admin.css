@@ -16,6 +16,12 @@ fieldset.relationship div label {
 	width: 150px;
 }
 
+@media screen and (min-width: 781px) {
+	.form-table.bp-relationship-options select {
+		max-width: 250px;
+	}
+}
+
 /* Members: Extended Profile */
 
 .field_type_relationship > label,
