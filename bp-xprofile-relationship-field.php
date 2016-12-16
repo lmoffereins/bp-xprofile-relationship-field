@@ -123,9 +123,6 @@ final class BP_XProfile_Relationship_Field {
 		// Main
 		add_filter( 'bp_xprofile_get_field_types', array( $this, 'add_field_type' ) );
 
-		// Group fields
-		add_filter( 'bp_xprofile_get_groups', array( $this, 'groups_add_field_data' ), 10, 2 );
-
 		// Single field
 		add_action( 'xprofile_field_after_save',      array( $this, 'save_field'    )        );
 		add_filter( 'bp_get_the_profile_field_value', array( $this, 'display_field' ), 10, 3 );
@@ -189,79 +186,6 @@ final class BP_XProfile_Relationship_Field {
 		}
 
 		return $fields;
-	}
-
-	/**
-	 * Manipulate fields data that were queried with profile groups
-	 *
-	 * @since 1.0.0
-	 *
-	 * @global WPDB $wpdb
-	 *
-	 * @param array $field_groups Field groups
-	 * @param array $args Group query args
-	 * @return array Groups
-	 */
-	public function groups_add_field_data( $field_groups, $args ) {
-		global $wpdb;
-
-		// Bail when fields are not fetched
-		if ( ! isset( $args['fetch_fields'] ) || ! $args['fetch_fields'] )
-			return $field_groups;
-
-		// Get BuddyPress
-		$bp = buddypress();
-
-		// Collect groups with fields. Groups might by empty.
-		$field_groups_with_fields = array();
-
-		foreach ( $field_groups as $group ) {
-			if ( isset( $group->fields ) ) {
-				$field_groups_with_fields[] = $group;
-			}
-		}
-
-		// Fetch all field ids to query for their data
-		$field_ids = wp_list_pluck( call_user_func_array( 'array_merge', wp_list_pluck( $field_groups_with_fields, 'fields' ) ), 'id' );
-		$field_ids = implode( ',', $field_ids );
-
-		// Query field 'order_by' column for all fields at once
-		$data = (array) $wpdb->get_results( "SELECT id, order_by FROM {$bp->profile->table_name_fields} WHERE id IN ( $field_ids )" );
-
-		// Walk groups
-		foreach ( $field_groups as $k => $group ) {
-
-			// Skip groups without fields
-			if ( ! isset( $group->fields ) )
-				continue;
-
-			// Walk group fields
-			foreach ( $group->fields as $i => $field ) {
-
-				// Get data of particular field
-				$field_data = wp_list_filter( $data, array( 'id' => $field->id ) );
-
-				// Skip when no data was found
-				if ( empty( $field_data ) )
-					continue;
-
-				$field_data = reset( $field_data );
-
-				/**
-				 * Ensure 'order_by' property is defined. This is necessary to
-				 * prevent 
-				 */
-				if ( ! isset( $field->order_by ) ) {
-					var_dump( $field_data );
-					$field->order_by = $field_data->order_by;
-				}
-
-				// Update group field
-				$field_groups[ $k ]->fields[ $i ] = $field;
-			}
-		}
-
-		return $field_groups;
 	}
 
 	/** Admin *****************************************************************/
