@@ -396,7 +396,7 @@ class BP_XProfile_Field_Type_Relationship extends BP_XProfile_Field_Type {
 				<tr>
 					<th scope="row">
 						<label for="<?php echo $sort_id; ?>">
-							<?php esc_html_e( 'Sort Order', 'buddypress' ); ?>
+							<?php esc_html_e( 'Sort Order', 'bp-xprofile-relationship-field' ); ?>
 						</label>
 					</th>
 
