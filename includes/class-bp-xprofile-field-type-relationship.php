@@ -154,7 +154,7 @@ class BP_XProfile_Field_Type_Relationship extends BP_XProfile_Field_Type {
 		$checkbox  = 'checkbox' === $method ? '[]' : '';
 
 		// Check for updated posted values, but errors preventing them from being saved first time
-		if ( isset( $_POST['field_' . $this->field_obj->id] ) && $option_values != maybe_serialize( $_POST['field_' . $this->field_obj->id] ) ) {
+		if ( isset( $_POST['field_' . $this->field_obj->id] ) && $option_values !== maybe_serialize( $_POST['field_' . $this->field_obj->id] ) ) {
 			if ( ! empty( $_POST['field_' . $this->field_obj->id] ) ) {
 				$option_values = array_map( 'sanitize_text_field', (array) $_POST['field_' . $this->field_obj->id] );
 			}
@@ -302,7 +302,7 @@ class BP_XProfile_Field_Type_Relationship extends BP_XProfile_Field_Type {
 
 		// Define field details
 		$current_field = bp_xprofile_relationship_field()->populate_field( $current_field );
-		$class         = $current_field->type != $type ? 'display: none;' : '';
+		$class         = $current_field->type !== $type ? 'display: none;' : '';
 
 		// Define field meta ids. Follow BP's pattern of `meta_name_{$type}`
 		$esc_type      = esc_attr( $type );
@@ -402,7 +402,7 @@ class BP_XProfile_Field_Type_Relationship extends BP_XProfile_Field_Type {
 
 					<td>
 						<select name="<?php echo $sort_id; ?>" id="<?php echo $sort_id; ?>" >
-							<option value="default"><?php _e( '&mdash; Default Sort &mdash;', 'bp-xprofile-relationship-field' ); ?></option>
+							<option value="default"><?php esc_html_e( '&mdash; Default Sort &mdash;', 'bp-xprofile-relationship-field' ); ?></option>
 							<option value="asc"  <?php selected( 'asc',  $current_field->order_by ); ?>><?php esc_html_e( 'Ascending',  'buddypress' ); ?></option>
 							<option value="desc" <?php selected( 'desc', $current_field->order_by ); ?>><?php esc_html_e( 'Descending', 'buddypress' ); ?></option>
 						</select>

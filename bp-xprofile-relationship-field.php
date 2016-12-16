@@ -32,6 +32,8 @@ final class BP_XProfile_Relationship_Field {
 
 	/**
 	 * The profile field type
+	 *
+	 * @since 1.0.0
 	 * @var string
 	 */
 	public $type = 'relationship';
@@ -189,40 +191,45 @@ final class BP_XProfile_Relationship_Field {
 		return $fields;
 	}
 
-	/** Groups ****************************************************************/
-
 	/**
 	 * Manipulate fields data that were queried with profile groups
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param array $groups Groups
+	 * @global WPDB $wpdb
+	 *
+	 * @param array $field_groups Field groups
 	 * @param array $args Group query args
 	 * @return array Groups
 	 */
-	public function groups_add_field_data( $groups, $args ) {
-		global $wpdb, $bp;
+	public function groups_add_field_data( $field_groups, $args ) {
+		global $wpdb;
 
 		// Bail when fields are not fetched
 		if ( ! isset( $args['fetch_fields'] ) || ! $args['fetch_fields'] )
-			return $groups;
+			return $field_groups;
+
+		// Get BuddyPress
+		$bp = buddypress();
 
 		// Collect groups with fields. Groups might by empty.
-		$groups_with_fields = array();
-		foreach ( $groups as $group ) {
+		$field_groups_with_fields = array();
+
+		foreach ( $field_groups as $group ) {
 			if ( isset( $group->fields ) ) {
-				$groups_with_fields[] = $group;
+				$field_groups_with_fields[] = $group;
 			}
 		}
 
 		// Fetch all field ids to query for their data
-		$field_ids = implode( ',', wp_list_pluck( call_user_func_array( 'array_merge', wp_list_pluck( $groups_with_fields, 'fields' ) ), 'id' ) );
+		$field_ids = wp_list_pluck( call_user_func_array( 'array_merge', wp_list_pluck( $field_groups_with_fields, 'fields' ) ), 'id' );
+		$field_ids = implode( ',', $field_ids );
 
-		// Query field data for all fields at once
+		// Query field 'order_by' column for all fields at once
 		$data = (array) $wpdb->get_results( "SELECT id, order_by FROM {$bp->profile->table_name_fields} WHERE id IN ( $field_ids )" );
 
 		// Walk groups
-		foreach ( $groups as $k => $group ) {
+		foreach ( $field_groups as $k => $group ) {
 
 			// Skip groups without fields
 			if ( ! isset( $group->fields ) )
@@ -233,25 +240,28 @@ final class BP_XProfile_Relationship_Field {
 
 				// Get data of particular field
 				$field_data = wp_list_filter( $data, array( 'id' => $field->id ) );
-				if ( ! empty( $field_data ) ) {
-					$field_data = reset( $field_data );
 
-				// Field data not found
-				} else {
+				// Skip when no data was found
+				if ( empty( $field_data ) )
 					continue;
-				}
 
-				// Ensure order_by property presence
+				$field_data = reset( $field_data );
+
+				/**
+				 * Ensure 'order_by' property is defined. This is necessary to
+				 * prevent 
+				 */
 				if ( ! isset( $field->order_by ) ) {
+					var_dump( $field_data );
 					$field->order_by = $field_data->order_by;
 				}
 
 				// Update group field
-				$groups[ $k ]->fields[ $i ] = $field;
+				$field_groups[ $k ]->fields[ $i ] = $field;
 			}
 		}
 
-		return $groups;
+		return $field_groups;
 	}
 
 	/** Admin *****************************************************************/
@@ -315,7 +325,7 @@ final class BP_XProfile_Relationship_Field {
 	}
 
 	/**
-	 * Display field value
+	 * Modify the display value for the current field
 	 *
 	 * @since 1.0.0
 	 *
@@ -393,9 +403,9 @@ final class BP_XProfile_Relationship_Field {
 	}
 
 	/**
-	 * Display field data
+	 * Modify the display data for the current field
 	 *
-	 * Filters {@see bp_get_member_field_data()} and {@see bp_get_profile_field_data()} as per BP 2.6.
+	 * Filters both {@see bp_get_member_field_data()} and {@see bp_get_profile_field_data()} as per BP 2.6.
 	 *
 	 * @since 1.0.3
 	 *
