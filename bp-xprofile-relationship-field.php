@@ -125,9 +125,7 @@ final class BP_XProfile_Relationship_Field {
 
 		// Single field
 		add_action( 'xprofile_field_after_save',      array( $this, 'save_field'    )        );
-		add_filter( 'bp_get_the_profile_field_value', array( $this, 'display_field' ), 10, 3 );
-		add_filter( 'bp_get_member_field_data',       array( $this, 'display_data'  ), 10, 2 );
-		add_filter( 'bp_get_profile_field_data',      array( $this, 'display_data'  ), 10, 2 );
+		add_filter( 'bp_get_the_profile_field_value', array( $this, 'display_field' ),  1, 3 );
 
 		// Admin
 		add_action( 'admin_enqueue_scripts', array( $this, 'admin_enqueue_scripts' ) );
@@ -285,8 +283,8 @@ final class BP_XProfile_Relationship_Field {
 		$options = bp_xprofile_relationship_field_options( $field );
 		$options_id_by_name = array_combine( wp_list_pluck( $options, 'id' ), wp_list_pluck( $options, 'name' ) );
 
-		// Fetch original value
-		$values = explode( ',', $field->data->value );
+		// Work with the provided value
+		$values     = explode( ',', $field_value );
 		$new_values = array();
 
 		// Walk all values
@@ -325,51 +323,9 @@ final class BP_XProfile_Relationship_Field {
 		 *
 		 * @param string $values Field display value
 		 * @param BP_XProfile_Field $field The current field object
+		 * @param string $field_value The original unfiltered value
 		 */
-		return apply_filters( 'bp_xprofile_relationship_field_display_value', $values, $field );
-	}
-
-	/**
-	 * Modify the display data for the current field
-	 *
-	 * Filters both {@see bp_get_member_field_data()} and {@see bp_get_profile_field_data()} as per BP 2.6.
-	 *
-	 * @since 1.0.3
-	 *
-	 * @global BP_XProfile_Field $field
-	 *
-	 * @param mixed $data Field data
-	 * @param array $args Field data arguments
-	 * @return mixed Field data
-	 */
-	public function display_data( $data, $args = array() ) {
-
-		// Valid field was queried, so get the field
-		if ( ! empty( $args['field'] ) && ! empty( $args['user_id'] )
-			&& $field = xprofile_get_field( is_numeric( $args['field'] ) ? $args['field'] : xprofile_get_field_id_from_name( $args['field'] ) )
-		) {
-
-			// Populate field data
-			$field->data = $field->get_field_data( $args['user_id'] );
-
-			// Temporary overwrite of the `$field` global
-			if ( $global = isset( $GLOBALS['field'] ) ) {
-				$_field = $GLOBALS['field'];
-			}
-			$GLOBALS['field'] = $field;
-
-			// Define value to display
-			$data = $this->display_field( $data, $field->type, $field->id );
-
-			// Reset global
-			if ( $global ) {
-				$GLOBALS['field'] = $_field;
-			} else {
-				unset( $GLOBALS['field'] );
-			}
-		}
-
-		return $data;
+		return apply_filters( 'bp_xprofile_relationship_field_display_value', $values, $field, $field_value );
 	}
 
 	/**

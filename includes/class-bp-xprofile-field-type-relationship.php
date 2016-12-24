@@ -416,6 +416,21 @@ class BP_XProfile_Field_Type_Relationship extends BP_XProfile_Field_Type {
 
 		<?php
 	}
+
+	/**
+	 * Modify the appreance of the Relationship field's value.
+	 *
+	 * Since BP 2.4+ usable because of the `$field_id` parameter context.
+	 *
+	 * @since 1.2.0
+	 *
+	 * @param mixed $field_value Field value
+	 * @param string|int $field_id Field ID.
+	 * @return mixed
+	 */
+	public static function display_filter( $field_value, $field_id = '' ) {
+		return bp_xprofile_relationship_field()->display_field( $field_value, 'relationship', $field_id );
+	}
 }
 
 endif;
