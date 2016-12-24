@@ -126,6 +126,7 @@ final class BP_XProfile_Relationship_Field {
 		// Single field
 		add_action( 'xprofile_field_after_save',      array( $this, 'save_field'    )        );
 		add_filter( 'bp_get_the_profile_field_value', array( $this, 'display_field' ),  1, 3 );
+		add_filter( 'bp_get_profile_field_data',      array( $this, 'display_data'  ),  1, 2 );
 
 		// Admin
 		add_action( 'admin_enqueue_scripts', array( $this, 'admin_enqueue_scripts' ) );
@@ -326,6 +327,79 @@ final class BP_XProfile_Relationship_Field {
 		 * @param string $field_value The original unfiltered value
 		 */
 		return apply_filters( 'bp_xprofile_relationship_field_display_value', $values, $field, $field_value );
+	}
+
+	/**
+	 * Modify the display data for the current field
+	 *
+	 * This is only relevant for displaying data. Queried relationship data
+	 * is always unfiltered.
+	 *
+	 * @since 1.0.3
+	 *
+	 * @global BP_XProfile_Field $field
+	 *
+	 * @param mixed $data Field data
+	 * @param array $args Field data arguments
+	 * @return mixed Field data
+	 */
+	public function display_data( $data, $args = array() ) {
+
+		// Get the field's ID
+		if ( ! empty( $args['field'] ) ) {
+			$field_id = is_numeric( $args['field'] ) ? $args['field'] : xprofile_get_field_id_from_name( $args['field'] );
+
+		// Bail when the field is unknown
+		} else {
+			return $data;
+		}
+
+		// Get the field
+		$field = xprofile_get_field( $field_id );
+
+		// Get possible field values
+		$options = bp_xprofile_relationship_field_options( $field );
+		$options_id_by_name = array_combine( wp_list_pluck( $options, 'id' ), wp_list_pluck( $options, 'name' ) );
+
+		// Work with the provided value
+		$new_values = array();
+
+		// Walk all values
+		foreach ( (array) $data as $value ) {
+
+			// Sanitize
+			$value = trim( $value );
+
+			// Find option by id value
+			if ( $option_by_value = wp_list_filter( $options, array( 'id' => (int) $value ) ) ) {
+				$option = reset( $option_by_value );
+
+				// Use option_by_value name if item was found
+				if ( $option && isset( $option->name ) ) {
+					$new_values[] = $option->name;
+				}
+
+			// Find option by name value. Compare sanitized titles
+			} elseif ( $id_by_name = array_search( sanitize_title( $value ), array_map( 'sanitize_title', $options_id_by_name ) ) ) {
+
+				// Get the option by value
+				$option_by_value = wp_list_filter( $options, array( 'id' => (int) $id_by_name ) );
+				$option = reset( $option_by_value );
+
+				// Use option_by_value name if item was found
+				if ( $option && isset( $option->name ) ) {
+					$new_values[] = $option->name;
+				}
+
+			// Option was not found, display stored value
+			} else {
+				$new_values[] = $value;
+			}
+		}
+
+		$data = $new_values;
+
+		return $data;
 	}
 
 	/**
