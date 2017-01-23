@@ -202,7 +202,7 @@ final class BP_XProfile_Relationship_Field {
 		if ( empty( $_GET['page'] ) || ! in_array( $_GET['page'], array( 'bp-profile-setup', 'bp-profile-edit' ) ) )
 			return;
 
-		wp_enqueue_style( 'bp-xprofile-relationship-field', $this->assets_url . 'admin.css', array( 'xprofile-admin-css' ), $this->version );
+		wp_enqueue_style( 'bp-xprofile-relationship-field-admin', $this->assets_url . 'admin.css', array( 'xprofile-admin-css' ), $this->version );
 	}
 
 	/** BP_XProfile_Field *****************************************************/
