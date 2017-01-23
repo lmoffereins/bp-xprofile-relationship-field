@@ -124,9 +124,8 @@ final class BP_XProfile_Relationship_Field {
 		add_filter( 'bp_xprofile_get_field_types', array( $this, 'add_field_type' ) );
 
 		// Single field
-		add_action( 'xprofile_field_after_save',      array( $this, 'save_field'    )        );
-		add_filter( 'bp_get_the_profile_field_value', array( $this, 'display_field' ),  1, 3 );
-		add_filter( 'bp_get_profile_field_data',      array( $this, 'display_data'  ),  1, 2 );
+		add_action( 'xprofile_field_after_save', array( $this, 'save_field'    )        );
+		add_filter( 'bp_get_profile_field_data', array( $this, 'display_data'  ),  1, 2 );
 
 		// Admin
 		add_action( 'admin_enqueue_scripts', array( $this, 'admin_enqueue_scripts' ) );
