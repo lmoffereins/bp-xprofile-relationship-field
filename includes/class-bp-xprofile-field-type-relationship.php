@@ -19,6 +19,30 @@ if ( ! class_exists( 'BP_XProfile_Field_Type_Relationship' ) ) :
 class BP_XProfile_Field_Type_Relationship extends BP_XProfile_Field_Type {
 
 	/**
+	 * Holds the relationship type
+	 *
+	 * @since 1.0.0
+	 * @var string
+	 */
+	public $related_to;
+
+	/**
+	 * Holds the field's selection method
+	 *
+	 * @since 1.0.0
+	 * @var string
+	 */
+	public $selection_method;
+
+	/**
+	 * Holds the relationship query's order by value
+	 *
+	 * @since 1.0.0
+	 * @var string
+	 */
+	public $order_type;
+
+	/**
 	 * Constructor for the single relationship field type
 	 *
 	 * @since 1.0.0

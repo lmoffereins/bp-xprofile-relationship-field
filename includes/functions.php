@@ -139,9 +139,11 @@ function bp_xprofile_relationship_field_options( $field ) {
 		return array();
 
 	// Setup option vars
-	$options = array();
-	$orderby = $field->order_type;
-	$order   = $field->order_by;
+	$options    = array();
+	$query_args = array(
+		'orderby' => ( 'default' !== $field->order_type ) ? $field->order_type : '',
+		'order'   => empty( $field->order_type ) || ( 'DESC' !== strtoupper( $field->order_type ) ) ? 'ASC' : 'DESC',
+	);
 
 	/**
 	 * Filter options to support custom relationship types
@@ -152,10 +154,7 @@ function bp_xprofile_relationship_field_options( $field ) {
 	 * @param string $object The relationship object type
 	 * @param BP_XProfile_Field $field The current field object
 	 */
-	$query_args = apply_filters( 'bp_xprofile_relationship_field_options_query_args', array(
-		'orderby' => ( 'default' !== $orderby ) ? $orderby : '',
-		'order'   => empty( $order ) || ( 'DESC' !== strtoupper( $order ) ) ? 'ASC' : 'DESC',
-	), $object, $field );
+	$query_args = apply_filters( 'bp_xprofile_relationship_field_options_query_args', $query_args, $object, $field );
 
 	// Check object to get the options
 	switch ( $object ) {
@@ -190,7 +189,7 @@ function bp_xprofile_relationship_field_options( $field ) {
 
 		// Users
 		case 'users' :
-			if ( 'date' == $orderby )
+			if ( 'date' === $query_args['orderby'] )
 				$query_args['orderby'] = 'user_registered';
 
 			// Query and list users
@@ -206,15 +205,15 @@ function bp_xprofile_relationship_field_options( $field ) {
 
 			// Fetch global roles
 			$_roles = $wp_roles->roles;
-			$_order = 'ASC' == $query_args['order'] ? SORT_ASC : SORT_DESC;
+			$_order = 'ASC' === $query_args['order'] ? SORT_ASC : SORT_DESC;
 
 			// Order roles
-			if ( 'name' == $orderby ) {
+			if ( 'name' === $query_args['orderby'] ) {
 				array_multisort( wp_list_pluck( $wp_roles->roles, 'name' ), $_order, SORT_STRING | SORT_FLAG_CASE, $_roles );
 
 			// Handle array sorting for default order
 			} else {
-				if ( SORT_DESC == $_order )
+				if ( SORT_DESC === $_order )
 					$_roles = array_reverse( $_roles );
 			}
 
@@ -229,7 +228,7 @@ function bp_xprofile_relationship_field_options( $field ) {
 		case 'comments' :
 
 			// Default 'name' and 'date' orderby to comment date
-			if ( in_array( $orderby, array( 'name', 'date' ) ) )
+			if ( in_array( $query_args['orderby'], array( 'name', 'date' ) ) )
 				$query_args['orderby'] = 'comment_date';
 
 			// Query and list comments
