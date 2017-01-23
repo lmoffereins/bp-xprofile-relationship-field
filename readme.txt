@@ -3,7 +3,7 @@ Contributors: Offereins
 Tags: buddypress, xprofile, profile, field, type, relationship, relation, objects
 Requires at least: 4.5, BP 2.7
 Tested up to: 4.7, BP 2.7
-Stable tag: 1.1.0
+Stable tag: 1.1.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -31,6 +31,10 @@ If you download BP XProfile Relationship Field manually, make sure it is uploade
 Activate BP XProfile Relationship Field in the "Plugins" admin panel using the "Activate" link. If you're using WordPress Multisite, you can choose to activate BP XProfile Relationship Field network wide for full integration with all of your sites.
 
 == Changelog ==
+
+= 1.1.1 =
+* Improve field display value rendering by using the field type's `display_field()` method
+* Minor overall fixes
 
 = 1.1.0 =
 * Plugin now requires BP 2.7
