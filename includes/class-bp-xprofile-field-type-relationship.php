@@ -173,9 +173,11 @@ class BP_XProfile_Field_Type_Relationship extends BP_XProfile_Field_Type {
 		$option_values = BP_XProfile_ProfileData::get_value_byid( $this->field_obj->id, $args['user_id'] );
 		$option_values = (array) maybe_unserialize( $option_values );
 
-		$html      = '';
-		$method    = $this->field_obj->selection_method;
-		$checkbox  = 'checkbox' === $method ? '[]' : '';
+		$html        = '';
+		$method      = $this->field_obj->selection_method;
+		$checkbox    = 'checkbox' === $method ? '[]' : ''; // Multiselectbox input name is defined at the `<select>` level
+		$type_map    = array( 'multiselectbox' => 'multiselect', 'checkbox' => 'checkbox', 'radio' => 'radio', 'selectbox' => 'select' );
+		$filter_type = isset( $type_map[ $method ] ) ? $type_map[ $method ] : 'relationship';
 
 		// Check for updated posted values, but errors preventing them from being saved first time
 		if ( isset( $_POST['field_' . $this->field_obj->id] ) && $option_values !== maybe_serialize( $_POST['field_' . $this->field_obj->id] ) ) {
@@ -232,7 +234,7 @@ class BP_XProfile_Field_Type_Relationship extends BP_XProfile_Field_Type {
 
 			$new_html = sprintf( $option_html,
 				$selected,
-				esc_attr( "field_{$this->field_obj->id}{$checkbox}" ),
+				esc_attr( bp_get_the_profile_field_input_name() . "{$checkbox}" ),
 				esc_attr( "field_{$this->field_obj->id}_{$allowed_option}" ),
 				esc_attr( stripslashes( $option->id ) ),
 				esc_html( stripslashes( $option->name ) )
@@ -240,6 +242,10 @@ class BP_XProfile_Field_Type_Relationship extends BP_XProfile_Field_Type {
 
 			/**
 			 * Filters the HTML output for an individual field options checkbox.
+			 *
+			 * The variable `$filter_type` part refers to the type of options being
+			 * filtered. Options are 'multiselectbox', 'selectbox', 'checkbox',
+			 * 'radio', or alternatively 'relationship' as a fallback.
 			 *
 			 * @since 1.0.0
 			 *
@@ -249,7 +255,7 @@ class BP_XProfile_Field_Type_Relationship extends BP_XProfile_Field_Type {
 			 * @param string $selected Current selected value.
 			 * @param string $k        Current index in the foreach loop.
 			 */
-			$html .= apply_filters( 'bp_get_the_profile_field_options_relationship', $new_html, $option, $this->field_obj->id, $selected, $k );
+			$html .= apply_filters( "bp_get_the_profile_field_options_{$filter_type}", $new_html, $option, $this->field_obj->id, $selected, $k );
 		}
 
 		// Wrap radio/checkbox options
