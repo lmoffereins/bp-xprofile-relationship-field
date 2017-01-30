@@ -166,8 +166,11 @@ function bp_xprofile_relationship_field_options( $field ) {
 				'posts_per_page' => -1,
 			) );
 
+			// Define post query
+			$query = new WP_Query( $query_args );
+
 			// Query and list posts
-			foreach ( get_posts( $query_args ) as $post ) {
+			foreach ( $query->posts as $post ) {
 				$options[] = (object) array( 'id' => $post->ID, 'name' => $post->post_title );
 			}
 
