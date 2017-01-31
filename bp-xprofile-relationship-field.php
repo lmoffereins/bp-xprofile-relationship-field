@@ -123,12 +123,13 @@ final class BP_XProfile_Relationship_Field {
 		// Main
 		add_filter( 'bp_xprofile_get_field_types', array( $this, 'add_field_type' ) );
 
-		// Single field
-		add_action( 'xprofile_field_after_save', array( $this, 'save_field'    )        );
-		add_filter( 'bp_get_profile_field_data', array( $this, 'display_data'  ),  1, 2 );
-
 		// Admin
-		add_action( 'admin_enqueue_scripts', array( $this, 'admin_enqueue_scripts' ) );
+		add_action( 'xprofile_field_after_save', array( $this, 'save_field'            ) );
+		add_action( 'admin_enqueue_scripts',     array( $this, 'admin_enqueue_scripts' ) );
+
+		// Parse data
+		add_filter( 'bp_get_profile_field_data', array( $this, 'display_data' ),  1, 2 );
+		add_filter( 'bp_xprofile_get_groups',    array( $this, 'get_groups'   ), 50, 2 );
 	}
 
 	/** Plugin ****************************************************************/
@@ -399,6 +400,56 @@ final class BP_XProfile_Relationship_Field {
 		$data = $new_values;
 
 		return $data;
+	}
+
+	/**
+	 * Modify the queried profile groups
+	 *
+	 * Ensures that item keys are parsed when groups are fetched with
+	 * raw field data.
+	 * 
+	 * @since 1.1.3
+	 *
+	 * @param array $groups Profile groups
+	 * @param array $args Query arguments
+	 * @return array Profile groups
+	 */
+	public function get_groups( $groups, $args ) {
+		
+		// When fetching raw field data
+		if ( isset( $args['fetch_field_data'] ) && $args['fetch_field_data'] ) {
+
+			// Walk fields in their groups
+			foreach ( $groups as $gk => $group ) {
+				foreach ( $group->fields as $fk => $field ) {
+
+					// Skip when the field is not of relationship type
+					if ( bp_xprofile_relationship_field_type() !== $field->type )
+						continue;
+
+					// Get field's relationship option
+					$options   = bp_xprofile_relationship_field_options( $field );
+					$option_id = (int) $field->data->value;
+					$option    = wp_list_filter( $options, array( 'id' => $option_id ) );
+
+					// Skip when the option does not exist
+					if ( ! $option )
+						continue;
+
+					// Set the option ID
+					$field->data->option_id = $option_id;
+
+					// Define value as the related item's title
+					$option = reset( $option );
+					$field->data->value = $option->name;
+
+					// Overwrite field object
+					$groups[ $gk ]->fields[ $fk ] = $field;
+				}
+			}
+		}
+
+		return $groups;
 	}
 
 	/**
