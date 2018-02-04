@@ -22,6 +22,27 @@ function bp_xprofile_relationship_field_type() {
 }
 
 /**
+ * Return whether the field is a Relationship field
+ *
+ * @since 1.2.0
+ *
+ * @param  BP_XProfile_Field|int $field_id Optional. Field object or ID. Defaults to current field.
+ * @return bool Is field of type Relationship?
+ */
+function bp_xprofile_is_relationship_field( $field = 0 ) {
+
+	// Get field
+	if ( $field ) {
+		$field = xprofile_get_field( $field );
+		$type  = $field->type;
+	} else {
+		$type = bp_get_the_profile_field_type();
+	}
+
+	return $type === bp_xprofile_relationship_field_type();
+}
+
+/**
  * Return all the possible object relationships
  *
  * @since 1.0.0
