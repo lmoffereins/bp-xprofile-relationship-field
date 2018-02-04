@@ -415,9 +415,11 @@ final class BP_XProfile_Relationship_Field {
 	 * @return array Profile groups
 	 */
 	public function get_groups( $groups, $args ) {
+		$fetch_fields     = isset( $args['fetch_fields'] ) && $args['fetch_fields'];
+		$fetch_field_data = isset( $args['fetch_field_data'] ) && $args['fetch_field_data'];
 		
-		// When fetching raw field data
-		if ( isset( $args['fetch_field_data'] ) && $args['fetch_field_data'] ) {
+		// When fetching fields with raw field data
+		if ( $fetch_fields && $fetch_field_data ) {
 
 			// Walk fields in their groups
 			foreach ( $groups as $gk => $group ) {
