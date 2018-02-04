@@ -73,90 +73,14 @@ class BP_XProfile_Field_Type_Relationship extends BP_XProfile_Field_Type {
 	 */
 	public function edit_field_html( array $raw_properties = array() ) {
 
-		// Define local variables
-		$user_id = bp_displayed_user_id();
-		$method  = bp_xprofile_get_meta( bp_get_the_profile_field_id(), 'field', 'selection_method' );
-		$args    = array();
+		// Get selection method
+		$method = bp_xprofile_get_meta( bp_get_the_profile_field_id(), 'field', 'selection_method' );
+		$types  = bp_xprofile_get_field_types();
 
-		// user_id is a special optional parameter that we pass to {@see bp_the_profile_field_options()}.
-		if ( isset( $raw_properties['user_id'] ) ) {
-			$user_id = (int) $raw_properties['user_id'];
-			unset( $raw_properties['user_id'] );
-		}
-
-		// Display field for (multi)selectbox
-		if ( 'selectbox' === $method || 'multiselectbox' === $method ) {
-
-			// Multiselect
-			if ( 'multiselectbox' === $method ) {
-				$args['multiple'] = 'multiple';
-			}
-
-			// Select
-			$multiple     = isset( $args['multiple'] ) ? '[]' : '';
-			$args['name'] = bp_get_the_profile_field_input_name() . $multiple;
-			$args['id']   = bp_get_the_profile_field_input_name() . $multiple;
-
-			?>
-
-			<legend id="<?php bp_the_profile_field_input_name(); ?>-1">
-				<?php bp_the_profile_field_name(); ?>
-				<?php bp_the_profile_field_required_label(); ?>
-			</legend>
-
-			<?php
-
-			/** This action is documented in bp-xprofile/bp-xprofile-classes */
-			do_action( bp_get_the_profile_field_errors_action() ); ?>
-
-			<select <?php echo $this->get_edit_field_html_elements( array_merge( $args, $raw_properties ) ); ?> aria-labelledby="<?php bp_the_profile_field_input_name(); ?>-1" aria-describedby="<?php bp_the_profile_field_input_name(); ?>-3">
-				<?php bp_the_profile_field_options( array( 'user_id' => $user_id ) ); ?>
-			</select>
-
-			<?php if ( bp_get_the_profile_field_description() ) : ?>
-				<p class="description" id="<?php bp_the_profile_field_input_name(); ?>-3"><?php bp_the_profile_field_description(); ?></p>
-			<?php endif; ?>
-
-			<?php if ( 'multiselectbox' === $method && ! bp_get_the_profile_field_is_required() ) : ?>
-
-				<a class="clear-value" href="javascript:clear( '<?php echo esc_js( bp_get_the_profile_field_input_name() ); ?>[]' );">
-					<?php esc_html_e( 'Clear', 'buddypress' ); ?>
-				</a>
-
-			<?php endif;
-
-		// Display field for radio/checkbox
-		} elseif ( 'radio' === $method || 'checkbox' === $method ) { ?>
-
-			<fieldset class="<?php echo $method; ?>">
-
-				<legend>
-					<?php bp_the_profile_field_name(); ?>
-					<?php bp_the_profile_field_required_label(); ?>
-				</legend>
-
-				<?php if ( bp_get_the_profile_field_description() ) : ?>
-					<p class="description" tabindex="0"><?php bp_the_profile_field_description(); ?></p>
-				<?php endif; ?>
-
-				<?php
-
-				/** This action is documented in bp-xprofile/bp-xprofile-classes */
-				do_action( bp_get_the_profile_field_errors_action() ); ?>
-
-				<?php bp_the_profile_field_options( array( 'user_id' => $user_id ) ); ?>
-
-				<?php if ( 'radio' === $method && ! bp_get_the_profile_field_is_required() ) : ?>
-
-					<a class="clear-value" href="javascript:clear( '<?php echo esc_js( bp_get_the_profile_field_input_name() ); ?>' );">
-						<?php esc_html_e( 'Clear', 'buddypress' ); ?>
-					</a>
-
-				<?php endif; ?>
-
-			</fieldset>
-
-			<?php
+		// Display field type's edit markup
+		if ( isset( $types[ $method ] ) ) {
+			$field = new $types[ $method ];
+			$field->edit_field_html( $raw_properties );
 		}
 	}
 
