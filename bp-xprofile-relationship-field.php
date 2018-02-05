@@ -499,21 +499,6 @@ final class BP_XProfile_Relationship_Field {
 			bp_xprofile_update_meta( $field->id, 'field', $meta, $_POST[ "{$meta}_{$type}" ] );
 		}
 	}
-
-	/**
-	 * Delete field data object with meta
-	 *
-	 * @since 1.0.0
-	 *
-	 * @param BP_XProfile_Field $field Field object
-	 */
-	public function delete_field( $field ) {
-
-		// Delete field meta
-		foreach ( $this->get_meta_keys() as $meta ) {
-			bp_xprofile_delete_meta( $field->id, 'field', $meta );
-		}
-	}
 }
 
 /**
