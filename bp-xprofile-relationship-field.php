@@ -121,7 +121,8 @@ final class BP_XProfile_Relationship_Field {
 		add_action( 'init', array( $this, 'load_textdomain' ) );
 
 		// Main
-		add_filter( 'bp_xprofile_get_field_types', array( $this, 'add_field_type' ) );
+		add_filter( 'bp_xprofile_get_field_types', array( $this, 'add_field_type'    ) );
+		add_filter( 'bp_field_css_classes',        array( $this, 'field_css_classes' ) );
 
 		// Admin
 		add_action( 'xprofile_field_after_save', array( $this, 'save_field'            ) );
@@ -188,6 +189,27 @@ final class BP_XProfile_Relationship_Field {
 		}
 
 		return $fields;
+	}
+
+	/**
+	 * Modify the field css classes
+	 *
+	 * @since 1.2.0
+	 *
+	 * @param  array $classes Field classes
+	 * @return array Field classes
+	 */
+	public function field_css_classes( $classes ) {
+		global $profile_template;
+
+		// Relationship field
+		if ( bp_xprofile_is_relationship_field() ) {
+
+			// Add selection method class to benefit native type styling
+			$classes[] = 'field_type_' . sanitize_title( $profile_template->field->selection_method );
+		}
+
+		return $classes;
 	}
 
 	/** Admin *****************************************************************/
