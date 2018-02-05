@@ -195,7 +195,7 @@ class BP_XProfile_Field_Type_Relationship extends BP_XProfile_Field_Type {
 			printf( '<div id="%1$s" class="input-options %3$s-options">%2$s</div>',
 				esc_attr( 'field_' . $this->field_obj->id ),
 				$html,
-				$method
+				'radio' === $method ? 'radio-button' : $method
 			);
 		} else {
 			echo $html;
