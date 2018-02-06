@@ -91,21 +91,21 @@ function bp_xprofile_relationship_field_get_relationships() {
 
 		// Post Types
 		'post_type' => array(
-			'category' => __( 'Post Types', 'bp-xprofile-relationship-field' ),
+			'category' => esc_html__( 'Post Types', 'bp-xprofile-relationship-field' ),
 			'options'  => array_combine( $post_type_keys, $post_type_labels ),
 		),
 
 		// Taxonomies
 		'taxonomy' => array(
-			'category' => __( 'Taxonomies', 'bp-xprofile-relationship-field' ),
+			'category' => esc_html__( 'Taxonomies', 'bp-xprofile-relationship-field' ),
 			'options'  => array_combine( $taxonomy_keys, $taxonomy_labels),
 		),
 
 		// Other WP Objects
-		// 'attachments' => __( 'Media' ),
-		'users'       => __( 'Users' ),
-		'roles'       => __( 'User Roles' ),
-		'comments'    => __( 'Comments' ),
+		// 'attachments' => esc_html__( 'Media' ),
+		'users'       => esc_html__( 'Users' ),
+		'roles'       => esc_html__( 'User Roles' ),
+		'comments'    => esc_html__( 'Comments' ),
 	) );
 }
 
@@ -339,7 +339,7 @@ function bp_xprofile_relationship_field_option_value( $option, $field = '' ) {
 			// Link posts to their respective pages
 			$value = sprintf( '<a href="%s" title="%s">%s</a>',
 				get_permalink( $option->id ),
-				sprintf( __( 'Permalink to %s', 'bp-xprofile-relationship-field' ), $option->name ),
+				sprintf( esc_html__( 'Permalink to %s', 'bp-xprofile-relationship-field' ), $option->name ),
 				$option->name
 			);
 
@@ -355,7 +355,7 @@ function bp_xprofile_relationship_field_option_value( $option, $field = '' ) {
 				// Link terms to their respective pages
 				$value = sprintf( '<a href="%s" title="%s">%s</a>',
 					get_term_link( $option->id ),
-					sprintf( __( 'Permalink to %s', 'bp-xprofile-relationship-field' ), $option->name ),
+					sprintf( esc_html__( 'Permalink to %s', 'bp-xprofile-relationship-field' ), $option->name ),
 					$option->name
 				);
 			}
@@ -368,7 +368,7 @@ function bp_xprofile_relationship_field_option_value( $option, $field = '' ) {
 			// Link user to the member's profile
 			$value = sprintf( '<a href="%s" title="%s">%s</a>',
 				bp_core_get_user_domain( $option->id ),
-				sprintf( __( 'Visit the profile of %s', 'bp-xprofile-relationship-field' ), $option->name ),
+				sprintf( esc_html__( 'Visit the profile of %s', 'bp-xprofile-relationship-field' ), $option->name ),
 				$option->name
 			);
 
@@ -424,7 +424,7 @@ function bp_xprofile_relationship_field_order_types() {
 	 * @param array $order_types Order types
 	 */
 	return apply_filters( 'bp_xprofile_relationship_field_order_types', array(
-		'name' => _x( 'Name', 'Object order type', 'bp-xprofile-relationship-field' ),
-		'date' => _x( 'Date', 'Object order type', 'bp-xprofile-relationship-field' ),
+		'name' => esc_html_x( 'Name', 'Object order type', 'bp-xprofile-relationship-field' ),
+		'date' => esc_html_x( 'Date', 'Object order type', 'bp-xprofile-relationship-field' ),
 	) );
 }
