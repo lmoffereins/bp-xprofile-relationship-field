@@ -73,14 +73,15 @@ class BP_XProfile_Field_Type_Relationship extends BP_XProfile_Field_Type {
 	 */
 	public function edit_field_html( array $raw_properties = array() ) {
 
-		// Get selection method
+		// Get selection method and native field types
 		$method = bp_xprofile_get_meta( bp_get_the_profile_field_id(), 'field', 'selection_method' );
 		$types  = bp_xprofile_get_field_types();
 
-		// Display field type's edit markup
+		// Display native field type's edit markup
 		if ( isset( $types[ $method ] ) ) {
-			$field = new $types[ $method ];
-			$field->edit_field_html( $raw_properties );
+			$type = new $types[ $method ];
+			$type->field_obj = $this->field_obj;
+			$type->edit_field_html( $raw_properties );
 		}
 	}
 
@@ -90,6 +91,13 @@ class BP_XProfile_Field_Type_Relationship extends BP_XProfile_Field_Type {
 	 * BuddyPress considers a field's "options" to be, for example, the items in a selectbox.
 	 * These are stored separately in the database, and their templating is handled seperately.
 	 *
+	 * For Relationship fields, the options are derived from the related object, registered in the
+	 * 'related_to' field metadata, so they are not native XProfile field options. As per BP 3.0+,
+	 * the options of a field (its 'children') are provided through the filter in
+	 * 'BP_XProfile_Field::get_children()', mimicing the native structure of field options from the
+	 * database. This allows for usage of any registered selection method/field type for selecting
+	 * the relationship field's data.
+	 *
 	 * This templating is separate from {@link BP_XProfile_Field_Type::edit_field_html()} because
 	 * it's also used in the wp-admin screens when creating new fields, and for backwards compatibility.
 	 *
@@ -97,16 +105,35 @@ class BP_XProfile_Field_Type_Relationship extends BP_XProfile_Field_Type {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @uses apply_filters() Calls 'bp_get_the_profile_field_options_relationship'
 	 * @param array $args Optional. The arguments passed to {@link bp_the_profile_field_options()}.
 	 */
 	public function edit_field_options_html( array $args = array() ) {
+
+		// Get selection method
+		$method = bp_xprofile_get_meta( $this->field_obj->id, 'field', 'selection_method' );
+
+		// BP 3.0+
+		// TODO: keep only this logic when not supporting BP 3.0-
+		if ( version_compare( bp_get_version(), '3.0.0', '>=' ) ) {
+
+			// Get native field types
+			$types = bp_xprofile_get_field_types();
+
+			// Display native field type's edit markup
+			if ( isset( $types[ $method ] ) ) {
+				$type = new $types[ $method ];
+				$type->field_obj = $this->field_obj;
+				$type->edit_field_options_html( $args );
+			}
+
+			return;
+		}
+
 		$options       = bp_xprofile_relationship_field_options( $this->field_obj );
 		$option_values = BP_XProfile_ProfileData::get_value_byid( $this->field_obj->id, $args['user_id'] );
 		$option_values = (array) maybe_unserialize( $option_values );
 
 		$html        = '';
-		$method      = $this->field_obj->selection_method;
 		$checkbox    = 'checkbox' === $method ? '[]' : ''; // Multiselectbox input name is defined at the `<select>` level
 		$type_map    = array( 'multiselectbox' => 'multiselect', 'checkbox' => 'checkbox', 'radio' => 'radio', 'selectbox' => 'select' );
 		$filter_type = isset( $type_map[ $method ] ) ? $type_map[ $method ] : 'relationship';

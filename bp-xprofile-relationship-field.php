@@ -121,8 +121,9 @@ final class BP_XProfile_Relationship_Field {
 		add_action( 'init', array( $this, 'load_textdomain' ) );
 
 		// Main
-		add_filter( 'bp_xprofile_get_field_types', array( $this, 'add_field_type'    ) );
-		add_filter( 'bp_field_css_classes',        array( $this, 'field_css_classes' ) );
+		add_filter( 'bp_xprofile_get_field_types',    array( $this, 'add_field_type'     )        );
+		add_filter( 'bp_field_css_classes',           array( $this, 'field_css_classes'  )        );
+		add_filter( 'bp_xprofile_field_get_children', array( $this, 'field_get_children' ), 10, 3 );
 
 		// Admin
 		add_action( 'xprofile_field_after_save', array( $this, 'save_field'            ) );
@@ -210,6 +211,46 @@ final class BP_XProfile_Relationship_Field {
 		}
 
 		return $classes;
+	}
+
+	/**
+	 * Modify the field's children
+	 *
+	 * @since 1.2.0
+	 *
+	 * @param  array             $children    Field children
+	 * @param  bool              $for_editing Whether the field is for editing
+	 * @param  BP_XProfile_Field $field       Field data
+	 * @return array Field children
+	 */
+	public function field_get_children( $children, $for_editing, $field ) {
+
+		// Relationship field
+		if ( bp_xprofile_is_relationship_field( $field ) ) {
+			$children = array();
+
+			// Get field options
+			foreach ( bp_xprofile_relationship_field_options( $field ) as $key => $option ) {
+
+				// Append default option details
+				$children[] = (object) array(
+					'id'                => "{$option->id}",
+					'group_id'          => '0',
+					'parent_id'         => "{$field->id}",
+					'type'              => 'option',
+					'name'              => $option->name,
+					'description'       => '',
+					'is_required'       => '0',
+					'is_default_option' => '0',
+					'field_order'       => '0',
+					'option_order'      => "{$key}",
+					'order_by'          => '',
+					'can_delete'        => '0'
+				);
+			}
+		}
+
+		return $children;
 	}
 
 	/** Admin *****************************************************************/
