@@ -44,6 +44,32 @@ function bp_xprofile_is_relationship_field( $field = 0 ) {
 }
 
 /**
+ * Return the field type object for the Relationship field's selection method
+ *
+ * @since 1.2.0
+ *
+ * @param  BP_XProfile_Field|int $field Optional. Field object or ID. Defaults to the current field.
+ * @return BP_XProfile_Field_Type Field type object
+ */
+function bp_xprofile_relationship_field_create_field_type( $field = 0 ) {
+	$field    = xprofile_get_field( $field );
+	$field_id = 0;
+
+	// Get field ID
+	if ( $field ) {
+		$field_id = $field->id;
+	} elseif ( isset( $GLOBALS['field'] ) ) {
+		$field_id = bp_get_the_profile_field_id();
+	}
+
+	// Get selection method and create a field type
+	$method = bp_xprofile_get_meta( $field_id, 'field', 'selection_method' );
+	$type   = bp_xprofile_create_field_type( $method );
+
+	return $type;
+}
+
+/**
  * Return all the possible object relationships
  *
  * @since 1.0.0
