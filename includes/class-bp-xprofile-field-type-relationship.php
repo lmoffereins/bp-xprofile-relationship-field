@@ -73,16 +73,17 @@ class BP_XProfile_Field_Type_Relationship extends BP_XProfile_Field_Type {
 	 */
 	public function edit_field_html( array $raw_properties = array() ) {
 
-		// Get selection method and native field types
-		$method = bp_xprofile_get_meta( bp_get_the_profile_field_id(), 'field', 'selection_method' );
-		$types  = bp_xprofile_get_field_types();
-
-		// Display native field type's edit markup
-		if ( isset( $types[ $method ] ) ) {
-			$type = new $types[ $method ];
-			$type->field_obj = $this->field_obj;
-			$type->edit_field_html( $raw_properties );
-		}
+		/**
+		 * Display native field type's edit markup
+		 *
+		 * Display of possible field options/children in the field HTML relies not
+		 * on the type's instance created here, but fetches them from the iterated
+		 * field global, using {@link bp_the_profile_field_options()}, which in turn
+		 * triggers the proper relationship type's field options HTML method below.
+		 */
+		$type = bp_xprofile_relationship_field_create_field_type( $this->field_obj );
+		$type->field_obj = $this->field_obj;
+		$type->edit_field_html( $raw_properties );
 	}
 
 	/**
@@ -109,22 +110,14 @@ class BP_XProfile_Field_Type_Relationship extends BP_XProfile_Field_Type {
 	 */
 	public function edit_field_options_html( array $args = array() ) {
 
-		// Get selection method
-		$method = bp_xprofile_get_meta( $this->field_obj->id, 'field', 'selection_method' );
-
 		// BP 3.0+
-		// TODO: keep only this logic when not supporting BP 3.0-
+		// TODO: keep only this logic when dropping support for BP pre-3.0
 		if ( version_compare( bp_get_version(), '3.0.0', '>=' ) ) {
 
-			// Get native field types
-			$types = bp_xprofile_get_field_types();
-
 			// Display native field type's edit markup
-			if ( isset( $types[ $method ] ) ) {
-				$type = new $types[ $method ];
-				$type->field_obj = $this->field_obj;
-				$type->edit_field_options_html( $args );
-			}
+			$type = bp_xprofile_relationship_field_create_field_type( $this->field_obj );
+			$type->field_obj = $this->field_obj;
+			$type->edit_field_options_html( $args );
 
 			return;
 		}
@@ -134,6 +127,7 @@ class BP_XProfile_Field_Type_Relationship extends BP_XProfile_Field_Type {
 		$option_values = (array) maybe_unserialize( $option_values );
 
 		$html        = '';
+		$method      = bp_xprofile_get_meta( $this->field_obj->id, 'field', 'selection_method' );
 		$checkbox    = 'checkbox' === $method ? '[]' : ''; // Multiselectbox input name is defined at the `<select>` level
 		$type_map    = array( 'multiselectbox' => 'multiselect', 'checkbox' => 'checkbox', 'radio' => 'radio', 'selectbox' => 'select' );
 		$filter_type = isset( $type_map[ $method ] ) ? $type_map[ $method ] : 'relationship';
