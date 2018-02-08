@@ -234,35 +234,10 @@ class BP_XProfile_Field_Type_Relationship extends BP_XProfile_Field_Type {
 	 */
 	public function admin_field_html( array $raw_properties = array() ) {
 
-		// Get the field's selection method
-		$method = bp_xprofile_get_meta( bp_get_the_profile_field_id(), 'field', 'selection_method' );
-
-		// Pre-check selection methods
-		if ( 'multiselectbox' === $method )  {
-			$raw_properties['multiple'] = 'multiple';
-		}
-
-		// Open (multi)selectbox
-		if ( 'selectbox' === $method || 'multiselectbox' === $method ) {
-			echo '<select ' . $this->get_edit_field_html_elements( $raw_properties ) . '>';
-		}
-
-		// Output the field options
-		bp_the_profile_field_options();
-
-		// Close (multi)selectbox
-		if ( 'selectbox' === $method || 'multiselectbox' === $method ) {
-			echo '</select>';
-		}
-
-		// Display 'Clear' toggle for non-required fields
-		if ( ( 'radio' === $method || 'multiselectbox' === $method ) && ! bp_get_the_profile_field_is_required() ) {
-			$multiple = isset( $raw_properties['multiple'] ) ? '[]' : ''; ?>
-
-			<a class="clear-value" href="javascript:clear( '<?php echo esc_js( bp_get_the_profile_field_input_name() . $multiple ); ?>' );"><?php esc_html_e( 'Clear', 'buddypress' ); ?></a>
-
-			<?php
-		}
+		// Display native field type's admin markup
+		$type = bp_xprofile_relationship_field_create_field_type( $this->field_obj );
+		$type->field_obj = $this->field_obj;
+		$type->admin_field_html( $raw_properties );
 	}
 
 	/**
