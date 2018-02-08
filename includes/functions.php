@@ -30,12 +30,13 @@ function bp_xprofile_relationship_field_type() {
  * @return bool Is field of type Relationship?
  */
 function bp_xprofile_is_relationship_field( $field = 0 ) {
+	$field = xprofile_get_field( $field );
+	$type  = '';
 
-	// Get field
+	// Get field type
 	if ( $field ) {
-		$field = xprofile_get_field( $field );
-		$type  = $field->type;
-	} else {
+		$type = $field->type;
+	} elseif ( isset( $GLOBALS['field'] ) ) {
 		$type = bp_get_the_profile_field_type();
 	}
 
