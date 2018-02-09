@@ -3,7 +3,7 @@ Contributors: Offereins
 Tags: buddypress, xprofile, profile, field, type, relationship, relation, objects
 Requires at least: 4.5, BP 2.7
 Tested up to: 4.9, BP 3.0
-Stable tag: 1.1.2
+Stable tag: 1.2.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
