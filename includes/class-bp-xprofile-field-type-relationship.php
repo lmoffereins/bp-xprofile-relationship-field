@@ -376,9 +376,9 @@ class BP_XProfile_Field_Type_Relationship extends BP_XProfile_Field_Type {
 	}
 
 	/**
-	 * Modify the appreance of the Relationship field's value.
+	 * Modify the appearance of the Relationship field's value.
 	 *
-	 * Since BP 2.4+ usable because of the `$field_id` parameter context.
+	 * In use as of BP 2.4+ because of the `$field_id` parameter context.
 	 *
 	 * @since 1.2.0
 	 *
