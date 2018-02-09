@@ -2,7 +2,7 @@
 Contributors: Offereins
 Tags: buddypress, xprofile, profile, field, type, relationship, relation, objects
 Requires at least: 4.5, BP 2.7
-Tested up to: 4.7, BP 2.8
+Tested up to: 4.9, BP 3.0
 Stable tag: 1.1.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -31,6 +31,11 @@ If you download BP XProfile Relationship Field manually, make sure it is uploade
 Activate BP XProfile Relationship Field in the "Plugins" admin panel using the "Activate" link. If you're using WordPress Multisite, you can choose to activate BP XProfile Relationship Field network wide for full integration with all of your sites.
 
 == Changelog ==
+
+= 1.2.0 =
+* Updated field type to use the selection method's native field type markup, which fixes a bug in BP 2.9
+* Updated field option handling to match upcoming BP 3.0
+* Added filter to group queries fetching field data to parse relationship field data
 
 = 1.1.2 =
 * Changed post object options to result from WP_Query which does not suppress filters

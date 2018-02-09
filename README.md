@@ -1,6 +1,6 @@
 # BP XProfile Relationship Field #
 
-Adds a relationship profile field type to connect members to other objects.
+Adds a relationship profile field type to connect members to other objects
 
 ## Description ##
 
