@@ -292,7 +292,6 @@ function bp_xprofile_relationship_field_options( $field ) {
 		// Attachments
 		case 'attachments' :
 			// To come...
-			break;
 
 		// Custom relationship type
 		default :
